@@ -1,1 +1,1 @@
-# team1-merch-shop
+# TEAM 1 - Merch Shop
