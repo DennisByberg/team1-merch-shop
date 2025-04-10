@@ -1,1 +1,1 @@
-# TEAM 1 - Merch Shop
+# TEAM 1 - Merch Shop!
