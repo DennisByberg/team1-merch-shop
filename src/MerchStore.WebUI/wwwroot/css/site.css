@@ -8,7 +8,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -21,11 +25,89 @@ body {
   margin-bottom: 60px;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* ----------------------------------------------------- */
+/* Hero Section with background image */
+.hero-section {
+  position: relative;
+  padding: 100px 20px;
+  background-image: url('/images/background.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 0.5rem;
+  color: white;
+}
+
+/* Transparant overlay */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(
+    231,
+    231,
+    231,
+    0.925
+  ); /* Justera opacitet här (0.5 = 50% transparens) */
+  border-radius: 0.5rem;
+}
+
+/* Innehåll ovanpå bakgrunden */
+.hero-content {
+  position: relative;
+  z-index: 2; /* Säkerställer att innehållet visas ovanpå bakgrunden */
+}
+
+/* Bättre textläsbarhet mot mörk bakgrund */
+.hero-section h1,
+.hero-section p {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* Card hover effect */
+.card {
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  padding: 10px 25px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0b5ed7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon colors */
+.text-primary i {
+  color: #0d6efd;
+}
+
+.header-logo {
+  width: 150px;
+  height: auto;
 }
