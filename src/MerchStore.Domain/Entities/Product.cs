@@ -15,57 +15,15 @@ public class Product : Entity<Guid>
 
     public Product(string name, string description, Uri? imageUrl, Money price, int stockQuantity) : base(Guid.NewGuid())
     {
-        // Validera namn
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Product name cannot be empty", nameof(name));
-        }
-
-        if (name.Length > 100)
-        {
-            throw new ArgumentException("Product name cannot exceed 100 characters", nameof(name));
-        }
-
-        // Validera beskrivning
-        if (string.IsNullOrWhiteSpace(description))
-        {
-            throw new ArgumentException("Product description cannot be empty", nameof(description));
-        }
-
-        if (description.Length > 500)
-        {
-            throw new ArgumentException("Product description cannot exceed 500 characters", nameof(description));
-        }
-
-        // Validera bild-URL (om angiven)
-        if (imageUrl != null)
-        {
-            // Tillåt endast http och https
-            if (imageUrl.Scheme != "http" && imageUrl.Scheme != "https")
-            {
-                throw new ArgumentException("Image URL must use HTTP or HTTPS protocol", nameof(imageUrl));
-            }
-
-            // Maxlängd på URL
-            if (imageUrl.AbsoluteUri.Length > 2000)
-            {
-                throw new ArgumentException("Image URL exceeds maximum length of 2000 characters", nameof(imageUrl));
-            }
-
-            // Kontrollera filändelse
-            string extension = Path.GetExtension(imageUrl.AbsoluteUri).ToLowerInvariant();
-            string[] validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-
-            if (!validExtensions.Contains(extension))
-            {
-                throw new ArgumentException("Image URL must point to a valid image file (jpg, jpeg, png, gif, webp)", nameof(imageUrl));
-            }
-        }
-
-        // Pris får inte vara null
+        ValidateName(name);
+        ValidateDescription(description);
         ArgumentNullException.ThrowIfNull(price);
 
-        // Lagerantal får inte vara negativt
+        if (imageUrl != null)
+        {
+            ValidateImageUrl(imageUrl);
+        }
+
         if (stockQuantity < 0)
         {
             throw new ArgumentException("Stock quantity cannot be negative", nameof(stockQuantity));
@@ -76,6 +34,21 @@ public class Product : Entity<Guid>
         ImageUrl = imageUrl;
         Price = price;
         StockQuantity = stockQuantity;
+    }
+
+    public void UpdateDetails(string name, string description, Uri? imageUrl)
+    {
+        ValidateName(name);
+        ValidateDescription(description);
+
+        if (imageUrl != null)
+        {
+            ValidateImageUrl(imageUrl);
+        }
+
+        Name = name;
+        Description = description;
+        ImageUrl = imageUrl;
     }
 
     public void UpdatePrice(Money newPrice)
@@ -94,7 +67,6 @@ public class Product : Entity<Guid>
 
         StockQuantity = quantity;
     }
-
 
     public bool DecrementStock(int quantity = 1)
     {
@@ -121,5 +93,44 @@ public class Product : Entity<Guid>
         }
 
         StockQuantity += quantity;
+    }
+
+    private static void ValidateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Product name cannot be empty", nameof(name));
+        }
+
+        if (name.Length > 100)
+        {
+            throw new ArgumentException("Name cannot exceed 100 characters", nameof(name));
+        }
+    }
+
+    private static void ValidateDescription(string description)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            throw new ArgumentException("Product description cannot be empty", nameof(description));
+        }
+
+        if (description.Length > 500)
+        {
+            throw new ArgumentException("Product description cannot exceed 500 characters", nameof(description));
+        }
+    }
+
+    private static void ValidateImageUrl(Uri imageUrl)
+    {
+        if (imageUrl.Scheme != "http" && imageUrl.Scheme != "https")
+        {
+            throw new ArgumentException("Image URL must use HTTP or HTTPS protocol", nameof(imageUrl));
+        }
+
+        if (imageUrl.AbsoluteUri.Length > 2000)
+        {
+            throw new ArgumentException("Image URL exceeds maximum length of 2000 characters", nameof(imageUrl));
+        }
     }
 }
