@@ -77,4 +77,49 @@ public class Product : Entity<Guid>
         Price = price;
         StockQuantity = stockQuantity;
     }
+
+    public void UpdatePrice(Money newPrice)
+    {
+        ArgumentNullException.ThrowIfNull(newPrice);
+
+        Price = newPrice;
+    }
+
+    public void UpdateStock(int quantity)
+    {
+        if (quantity < 0)
+        {
+            throw new ArgumentException("Stock quantity cannot be negative", nameof(quantity));
+        }
+
+        StockQuantity = quantity;
+    }
+
+
+    public bool DecrementStock(int quantity = 1)
+    {
+        if (quantity <= 0)
+        {
+            throw new ArgumentException("Quantity must be positive", nameof(quantity));
+        }
+
+        if (StockQuantity < quantity)
+        {
+            return false;
+        }
+
+        StockQuantity -= quantity;
+
+        return true;
+    }
+
+    public void IncrementStock(int quantity)
+    {
+        if (quantity <= 0)
+        {
+            throw new ArgumentException("Quantity must be positive", nameof(quantity));
+        }
+
+        StockQuantity += quantity;
+    }
 }
