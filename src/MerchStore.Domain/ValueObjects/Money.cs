@@ -26,7 +26,7 @@ public record Money
         Currency = currency.ToUpper();
     }
 
-    // Skapar ett Money-objekt med SEK som valuta (statisk fabriksmetod)
+    // Skapar ett Money-objekt med SEK som valuta (Static Factory Method design pattern)
     public static Money FromSEK(decimal amount)
     {
         return new Money(amount, "SEK");
