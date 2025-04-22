@@ -4,9 +4,6 @@ using MerchStore.Application.Services.Interfaces;
 
 namespace MerchStore.Application;
 
-/// <summary>
-/// Contains extension methods for registering Application layer services with the dependency injection container.
-/// </summary>
 public static class DependencyInjection
 {
     /// <summary>
