@@ -50,7 +50,7 @@ public class AppDbContextSeeder
             // Lägg till exempelprodukter
             var products = new List<Product>
             {
-                new Product(
+                new(
                     "Conference T-Shirt",
                     "A comfortable cotton t-shirt with the conference logo.",
                     // new Uri("https://example.com/images/tshirt.jpg"),
@@ -58,7 +58,7 @@ public class AppDbContextSeeder
                     Money.FromSEK(249.99m),
                     50),
 
-                new Product(
+                new(
                     "Developer Mug",
                     "A ceramic mug with a funny programming joke.",
                     // new Uri("https://example.com/images/mug.jpg"),
@@ -66,7 +66,7 @@ public class AppDbContextSeeder
                     Money.FromSEK(149.50m),
                     100),
 
-                new Product(
+                new(
                     "Laptop Sticker Pack",
                     "A set of 5 programming language stickers for your laptop.",
                     // new Uri("https://example.com/images/stickers.jpg"),
@@ -74,7 +74,7 @@ public class AppDbContextSeeder
                     Money.FromSEK(79.99m),
                     200),
 
-                new Product(
+                new(
                     "Branded Hoodie",
                     "A warm hoodie with the company logo, perfect for cold offices.",
                     // new Uri("https://example.com/images/hoodie.jpg"),
