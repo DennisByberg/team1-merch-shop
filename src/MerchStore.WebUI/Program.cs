@@ -1,17 +1,26 @@
+using System.Text.Json.Serialization;
 using MerchStore.Application;
 using MerchStore.Infrastructure;
 using MerchStore.WebUI.Authentication.ApiKey;
+using MerchStore.WebUI.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// services to the container.
+builder.Services.AddControllersWithViews()
+.AddJsonOptions(jsonOptions =>
+    {
+        // Use snake_case for JSON serialization
+        jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+        jsonOptions.JsonSerializerOptions.DictionaryKeyPolicy = new JsonSnakeCaseNamingPolicy();
+        jsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
-// Add API Key authentication
+// API Key authentication
 builder.Services.AddAuthentication()
    .AddApiKey(builder.Configuration["ApiKey:Value"] ?? throw new InvalidOperationException("API Key is not configured in the application settings."));
 
-// Add API Key authorization
+// API Key authorization
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiKeyPolicy", policy =>
@@ -19,11 +28,22 @@ builder.Services.AddAuthorization(options =>
               .RequireAuthenticatedUser());
 });
 
-// Add Application services - this includes Services, Interfaces, etc.
+// Application services - this includes Services, Interfaces, etc.
 builder.Services.AddApplication();
 
-// Add Infrastructure services - this includes DbContext, Repositories, etc.
+// Infrastructure services - this includes DbContext, Repositories, etc.
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()  // Allow requests from any origin
+                   .AllowAnyHeader()  // Allow any headers
+                   .AllowAnyMethod(); // Allow any HTTP method
+        });
+});
 
 var app = builder.Build();
 
@@ -43,12 +63,9 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-// Add authentication middleware
-app.UseAuthentication();
-
-// Add authorization middleware
-app.UseAuthorization();
+app.UseCors("AllowAllOrigins");
+app.UseAuthentication(); // Authentication middleware
+app.UseAuthorization(); // Authorization middleware
 
 app.MapControllerRoute(
     name: "default",
