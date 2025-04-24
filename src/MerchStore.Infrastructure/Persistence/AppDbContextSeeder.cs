@@ -54,7 +54,7 @@ public class AppDbContextSeeder
                     "Conference T-Shirt",
                     "A comfortable cotton t-shirt with the conference logo.",
                     // new Uri("https://example.com/images/tshirt.jpg"),
-                    new Uri("https://merchstore202503311226.blob.core.windows.net/images/tshirt.png"),
+                    new Uri("https://merchstorageno1.blob.core.windows.net/merch/T-hirt.png"),
                     Money.FromSEK(249.99m),
                     50),
 
@@ -62,15 +62,15 @@ public class AppDbContextSeeder
                     "Developer Mug",
                     "A ceramic mug with a funny programming joke.",
                     // new Uri("https://example.com/images/mug.jpg"),
-                    new Uri("https://merchstore202503311226.blob.core.windows.net/images/mug.png"),
+                    new Uri("https://merchstorageno1.blob.core.windows.net/merch/mugg.png"),
                     Money.FromSEK(149.50m),
                     100),
 
                 new(
-                    "Laptop Sticker Pack",
-                    "A set of 5 programming language stickers for your laptop.",
+                    "Cap",
+                    "A cap to look cool in",
                     // new Uri("https://example.com/images/stickers.jpg"),
-                    new Uri("https://merchstore202503311226.blob.core.windows.net/images/stickers.png"),
+                    new Uri("https://merchstorageno1.blob.core.windows.net/merch/vit keps.png"),
                     Money.FromSEK(79.99m),
                     200),
 
@@ -78,7 +78,7 @@ public class AppDbContextSeeder
                     "Branded Hoodie",
                     "A warm hoodie with the company logo, perfect for cold offices.",
                     // new Uri("https://example.com/images/hoodie.jpg"),
-                    new Uri("https://merchstore202503311226.blob.core.windows.net/images/hoodie.png"),
+                    new Uri("https://merchstorageno1.blob.core.windows.net/merch/Hoodie.png"),
                     Money.FromSEK(499.99m),
                     25)
             };
