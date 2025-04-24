@@ -1,11 +1,23 @@
 html {
   font-size: 14px;
+  position: relative;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
   html {
     font-size: 16px;
   }
+}
+
+.nav-link {
+  color: rgb(220, 220, 220);
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: rgb(172, 95, 95);
+  text-decoration: none;
 }
 
 .btn:focus,
@@ -16,13 +28,10 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
   margin-bottom: 60px;
+  color: white;
+  background-color: rgb(15, 15, 15);
 }
 
 .form-floating > .form-control-plaintext::placeholder,
@@ -41,11 +50,13 @@ body {
 .hero-section {
   position: relative;
   padding: 100px 20px;
-  background-image: url('/images/background.jpg');
+  background-image: url('/images/soundwaves.png');
   background-size: cover;
   background-position: center;
   border-radius: 0.5rem;
-  color: white;
+  max-width: 900px; /* Begränsar sektionens maxbredd */
+  margin-left: auto; /* Centrerar sektionen */
+  margin-right: auto;
 }
 
 /* Transparant overlay */
@@ -56,12 +67,6 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(
-    231,
-    231,
-    231,
-    0.925
-  ); /* Justera opacitet här (0.5 = 50% transparens) */
   border-radius: 0.5rem;
 }
 
@@ -80,25 +85,31 @@ body {
 /* Card hover effect */
 .card {
   transition: transform 0.3s ease;
+  background-color: transparent;
+  color: white;
+  border: 2px solid rgba(255, 155, 155, 0.151);
 }
 
 .card:hover {
   transform: translateY(-5px);
 }
 
+.card-logo {
+  color: rgba(255, 52, 52, 0.7);
+}
+
 /* Button styling */
 .btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+  background-color: rgb(15, 15, 15);
+  border-color: #ff5252;
   padding: 10px 25px;
   border-radius: 5px;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: #0b5ed7;
-  border-color: #0b5ed7;
-  transform: translateY(-2px);
+  background-color: #ff52523f;
+  border-color: #ff52523f;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -108,6 +119,19 @@ body {
 }
 
 .header-logo {
-  width: 150px;
+  width: 5rem;
   height: auto;
+}
+
+.navbar-toggler {
+  border-color: transparent;
+}
+
+.navbar-toggler:focus {
+  border-color: transparent;
+  box-shadow: none; /* Lägg till denna rad */
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255,255,255,1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
