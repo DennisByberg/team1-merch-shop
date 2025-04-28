@@ -16,7 +16,8 @@ type Product = {
 export function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
-  const apiUrl = 'http://localhost:5293';
+  const apiUrl =
+    'https://merchstorebackend.agreeabledesert-a7938720.swedencentral.azurecontainerapps.io';
 
   useEffect(() => {
     axios

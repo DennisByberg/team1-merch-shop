@@ -16,7 +16,8 @@ type Product = {
 export function ProductCatalog() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const apiUrl = 'http://localhost:5293';
+  const apiUrl =
+    'https://merchstorebackend.agreeabledesert-a7938720.swedencentral.azurecontainerapps.io';
 
   useEffect(() => {
     setLoading(true);

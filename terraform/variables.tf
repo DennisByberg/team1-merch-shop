@@ -16,22 +16,40 @@ variable "environment_name" {
   default     = "MerchStoreEnv"
 }
 
-variable "app_name" {
-  description = "Name of the Container App"
+variable "backend_app_name" {
+  description = "Name of the backend Container App"
   type        = string
-  default     = "merchstoreapp"
+  default     = "merchstorebackend"
 }
 
-variable "container_image" {
-  description = "Docker image for the container app"
+variable "frontend_app_name" {
+  description = "Name of the frontend Container App"
   type        = string
-  default     = "dennisbyberg/team1-merch-shop:latest"
+  default     = "merchstorefrontend"
+}
+
+variable "backend_container_image" {
+  description = "Docker image for the backend container app"
+  type        = string
+  default     = "dennisbyberg/merch-store-backend:latest"
+}
+
+variable "frontend_container_image" {
+  description = "Docker image for the frontend container app"
+  type        = string
+  default     = "dennisbyberg/merch-store-frontend:latest"
 }
 
 variable "container_port" {
   description = "Container port to expose"
   type        = number
   default     = 8080
+}
+
+variable "frontend_port" {
+  description = "Frontend container port to expose"
+  type        = number
+  default     = 80
 }
 
 variable "cpu" {
