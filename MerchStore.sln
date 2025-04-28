@@ -11,11 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MerchStore.Application", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MerchStore.Infrastructure", "src\MerchStore.Infrastructure\MerchStore.Infrastructure.csproj", "{4B3C85E0-27E4-44CA-8CB0-2AD1E1F87A89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MerchStore.WebUI", "src\MerchStore.WebUI\MerchStore.WebUI.csproj", "{05216A2F-2E8A-4270-B530-A5C879A5B1D1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MerchStore.Domain.UnitTests", "tests\MerchStore.Domain.UnitTests\MerchStore.Domain.UnitTests.csproj", "{13F108F3-3FB3-46CD-A9E1-9A41DF60FE8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MerchStore.WebApi", "src\MerchStore.WebApi\MerchStore.WebApi.csproj", "{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +87,18 @@ Global
 		{13F108F3-3FB3-46CD-A9E1-9A41DF60FE8C}.Release|x64.Build.0 = Release|Any CPU
 		{13F108F3-3FB3-46CD-A9E1-9A41DF60FE8C}.Release|x86.ActiveCfg = Release|Any CPU
 		{13F108F3-3FB3-46CD-A9E1-9A41DF60FE8C}.Release|x86.Build.0 = Release|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Debug|x64.Build.0 = Debug|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Debug|x86.Build.0 = Debug|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Release|x64.ActiveCfg = Release|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Release|x64.Build.0 = Release|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Release|x86.ActiveCfg = Release|Any CPU
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,5 +109,6 @@ Global
 		{4B3C85E0-27E4-44CA-8CB0-2AD1E1F87A89} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{05216A2F-2E8A-4270-B530-A5C879A5B1D1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{13F108F3-3FB3-46CD-A9E1-9A41DF60FE8C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{A8A12AE6-0BAF-4B20-BDE3-A3B000CCBAD1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

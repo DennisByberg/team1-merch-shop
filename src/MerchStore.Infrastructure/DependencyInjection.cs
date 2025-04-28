@@ -8,49 +8,24 @@ using MerchStore.Infrastructure.Persistence.Repositories;
 
 namespace MerchStore.Infrastructure;
 
-/// <summary>
-/// Contains extension methods for registering Infrastructure layer services with the dependency injection container.
-/// This keeps all registration logic in one place and makes it reusable.
-/// </summary>
+// Syfte med denna klass: Centralisera all DI-registrering och byt till SQLite.
 public static class DependencyInjection
 {
-    /// <summary>
-    /// Adds Infrastructure layer services to the DI container
-    /// </summary>
-    /// <param name="services">The service collection to add services to</param>
-    /// <param name="configuration">The configuration for database connection strings</param>
-    /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // Register DbContext with in-memory database
-        // In a real application, you'd use a real database
+        // Byt till SQLite
         services.AddDbContext<AppDbContext>(options =>
-            options.UseInMemoryDatabase("MerchStoreDb"));
+            options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
-        // Register repositories
         services.AddScoped<IProductRepository, ProductRepository>();
-
-        // Register Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        // Register Repository Manager
         services.AddScoped<IRepositoryManager, RepositoryManager>();
-
-        // Add logging services if not already added
         services.AddLogging();
-
-        // Register DbContext seeder
         services.AddScoped<AppDbContextSeeder>();
 
         return services;
     }
 
-    /// <summary>
-    /// Seeds the database with initial data.
-    /// This is an extension method on IServiceProvider to allow it to be called from Program.cs.
-    /// </summary>
-    /// <param name="serviceProvider">The service provider to resolve dependencies</param>
-    /// <returns>A task representing the asynchronous operation</returns>
     public static async Task SeedDatabaseAsync(this IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
