@@ -1,106 +1,101 @@
-## .NET and Visual Studio
-##
+# Dotenv & DB
+.env
+*.db*
+*.sqlite
 
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
+# Build & Output
+bin/
+obj/
+artifacts/
+build/
 bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+publish/
+dist/
+out/
+logs/
+*.log
 
-# Visual Studio files
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VS/VSCode/Rider/JetBrains
 .vs/
-# Ignore all .vscode files and folders
-.vscode/
-*.code-workspace
+.idea/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
-*.userprefs
-Generated\ Files/
-.localhistory/
-.vshistory/
+*.sln.iml
+*.DotSettings.user
+.vscode/
+.history/
+*.code-workspace
 
-# Test Results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
-*.VisualState.xml
-TestResult.xml
-nunit-*.xml
-coverage*.json
-coverage*.xml
-coverage*.info
+# Mono/Xamarin
+*.userprefs
+mono_crash.*
+
+# Test & Coverage
+TestResult*/
+coverage*
 *.coverage
 *.coveragexml
+*.VisualState.xml
+nunit-*.xml
 
-# .NET Core
-project.lock.json
-project.fragment.lock.json
-artifacts/
-.tye/
-ScaffoldingReadMe.txt
-
-# NuGet
-*.nupkg
-*.snupkg
-**/[Pp]ackages/*
-!**/[Pp]ackages/build/
-*.nuget.props
-*.nuget.targets
-
-## Terraform
-##
-.terraform/
-*.tfstate
-*.tfstate.*
-*.tfvars
-.terraformrc
-terraform.rc
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-crash.log
-crash.*.log
-.terraform.lock.hcl
-
-## Environment Files
-##
-.env
-
-## IDE and Editor Files
-##
-# Visual Studio Code
-.history/
-
-# JetBrains Rider
-*.sln.iml
-.idea/
-
-# ReSharper/Visual Studio
-_ReSharper*/
-*.[Rr]e[Ss]harper
-*.DotSettings.user
-*.gpState
-
-## System Files
-##
-# Windows
+# OS/Editor/Temp
+.DS_Store
 Thumbs.db
 ehthumbs.db
-ehthumbs_vista.db
+*.swp
+*.tmp
+*.bak
+*.cache
+*.pidb
+
+# Azure/Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.terraform.lock.hcl
+
+# Publish/Deploy
+*.publish.xml
+*.azurePubxml
+*.pubxml
+*.publishproj
+
+# Misc
+*.pfx
+*.snk
+*.dbmdl
+*.jfm
+*.aps
+*.ncb
+*.opendb
+*.sdf
+*.VC.db
+*.VC.VC.opendb
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.e2e
+*.gpState
+*.tss
+*.jmconfig
+*.btp.cs
+*.btm.cs
+*.odx.cs
+*.xsd.cs
+*.binlog
+*.nvuser
+*.localhistory/
+*.vshistory/
 *.stackdump
-[Dd]esktop.ini
 $RECYCLE.BIN/
 *.cab
 *.msi
@@ -108,34 +103,3 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 *.lnk
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-Icon
-._*
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# Vim
-*.swp
-
-# Other ignored files
-*~
-~$*
-*.dbmdl
-*.dbproj.schemaview
-*.jfm
-*.pfx
-*.publishsettings
