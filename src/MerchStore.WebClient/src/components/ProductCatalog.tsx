@@ -1,74 +1,122 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-
-type Product = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  currency: string;
-  imageUrl?: string;
-  stockQuantity: number;
-  inStock: boolean;
-};
+import { Product } from '../types/globalTypes';
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  CardActions,
+  Button,
+  Chip,
+  Container,
+  Box,
+  SxProps,
+  Theme,
+} from '@mui/material';
+import { fetchProducts } from '../api/productApi';
 
 export function ProductCatalog() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const apiUrl =
-    'https://merchstorebackend.agreeabledesert-a7938720.swedencentral.azurecontainerapps.io';
 
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get<Product[]>(`${apiUrl}/api/products`, {
-        headers: {
-          'X-API-Key': 'API_KEY', // Replace with your real API key!
-        },
-      })
-      .then((response) => setProducts(response.data))
+    fetchProducts()
+      .then(setProducts)
       .catch((error) => {
         console.error('Failed to fetch products:', error);
-      })
-      .finally(() => setLoading(false));
+      });
   }, []);
 
+  if (!products) return <Box>Loading...</Box>;
+
   return (
-    <div style={{ maxWidth: 800, margin: 'auto' }}>
-      <h1>Product Catalog</h1>
-      {loading ? (
-        <p>Loading products...</p>
-      ) : (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-          {products.map((product) => (
-            <div
-              key={product.id}
-              style={{ border: '1px solid #eee', padding: 16, width: 220 }}
-            >
-              <Link
+    <Container>
+      <Box sx={CATALOG_CONTAINER_SX}>
+        {products.map((product) => (
+          <Card key={product.id} sx={PRODUCT_CARD_SX}>
+            {product.imageUrl && (
+              <CardMedia
+                component={'img'}
+                height="180"
+                image={product.imageUrl}
+                alt={product.name}
+                sx={PRODUCT_IMAGE_SX}
+              />
+            )}
+            <CardContent sx={PRODUCT_CONTENT_SX}>
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                {product.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                {product.description}
+              </Typography>
+              <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 1 }}>
+                {product.price} {product.currency}
+              </Typography>
+              <Chip
+                label={product.inStock ? 'In Stock' : 'Out of Stock'}
+                color={product.inStock ? 'success' : 'default'}
+                size={'small'}
+                sx={{ mt: 1 }}
+              />
+            </CardContent>
+            <CardActions sx={PRODUCT_ACTIONS_SX}>
+              <Button
+                component={Link}
                 to={`/product/${product.id}`}
-                style={{ textDecoration: 'none', color: 'inherit' }}
+                variant={'outlined'}
+                color={'primary'}
+                size={'small'}
               >
-                {product.imageUrl && (
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    style={{ width: '100%', height: 120, objectFit: 'cover' }}
-                  />
-                )}
-                <h2 style={{ fontSize: 18 }}>{product.name}</h2>
-                <p>
-                  <b>
-                    {product.price} {product.currency}
-                  </b>
-                </p>
-                <p>{product.inStock ? 'In stock' : 'Out of stock'}</p>
-              </Link>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+                View Details
+              </Button>
+              <Button
+                variant={'contained'}
+                color={'primary'}
+                size={'small'}
+                disabled={!product.inStock}
+                sx={{ ml: 1 }}
+              >
+                Add to Cart
+              </Button>
+            </CardActions>
+          </Card>
+        ))}
+      </Box>
+    </Container>
   );
 }
+
+/*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
+const CATALOG_CONTAINER_SX: SxProps<Theme> = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 3,
+  justifyContent: 'center',
+};
+
+const PRODUCT_CARD_SX: SxProps<Theme> = {
+  maxWidth: 320,
+  display: 'flex',
+  flexDirection: 'column',
+  borderRadius: 2,
+  flexGrow: 1,
+  height: 420,
+  boxShadow: '2px 2px 3px rgba(0, 0, 0, 0.7)',
+  border: '2px solid black',
+};
+
+const PRODUCT_IMAGE_SX: SxProps<Theme> = {
+  objectFit: 'contain',
+  p: 3,
+};
+
+const PRODUCT_CONTENT_SX: SxProps<Theme> = {
+  flexGrow: 1,
+};
+
+const PRODUCT_ACTIONS_SX: SxProps<Theme> = {
+  mt: 'auto',
+  px: 2,
+  pb: 2,
+};
