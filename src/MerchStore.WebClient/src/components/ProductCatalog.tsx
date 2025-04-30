@@ -15,9 +15,11 @@ import {
   Theme,
 } from '@mui/material';
 import { fetchProducts } from '../api/productApi';
+import { useCart } from '../hooks/useCart';
 
 export function ProductCatalog() {
   const [products, setProducts] = useState<Product[]>([]);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     fetchProducts()
@@ -76,8 +78,9 @@ export function ProductCatalog() {
                 size={'small'}
                 disabled={!product.inStock}
                 sx={{ ml: 1 }}
+                onClick={() => addToCart(product)}
               >
-                Add to Cart
+                Add To Cart
               </Button>
             </CardActions>
           </Card>
