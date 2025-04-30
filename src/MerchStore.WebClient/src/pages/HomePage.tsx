@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import soundwavesPNG from '../assets/soundwaves.png';
 import BrandRedButton from '../components/BrandRedButton';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ProductSlider from '../components/ProductSlider';
 
 export default function HomePage() {
   const HERO_TITLE = 'ECHOCRAFT';
@@ -17,7 +18,7 @@ export default function HomePage() {
             variant={'h2'}
             component={'h1'}
             fontWeight={'bold'}
-            mb={2}
+            mb={3}
             color={'text.primary'}
           >
             {HERO_TITLE}
@@ -35,6 +36,7 @@ export default function HomePage() {
           </BrandRedButton>
         </Box>
       </Box>
+      <ProductSlider />
     </>
   );
 }
@@ -44,7 +46,7 @@ const HERO_CONTAINER_SX: SxProps<Theme> = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: '80vh',
+  minHeight: '60vh',
   textAlign: 'center',
   overflow: 'hidden',
   maxWidth: 1080,
