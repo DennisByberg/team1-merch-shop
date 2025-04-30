@@ -9,7 +9,6 @@ import {
   Chip,
   Divider,
   Button,
-  TextField,
   SxProps,
   Theme,
   IconButton,
@@ -17,11 +16,17 @@ import {
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { fetchProduct } from '../api/productApi';
+import { useCart } from '../hooks/useCart';
 
 export function ProductDetailsPage() {
-  const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
+
+  const { id } = useParams();
+  const { addToCart, items } = useCart();
   const navigate = useNavigate();
+
+  const cartItem = items.find((item) => item.id === product?.id);
+  const quantityInCart = cartItem ? cartItem.quantity : 0;
 
   useEffect(() => {
     if (!id) return;
@@ -43,21 +48,21 @@ export function ProductDetailsPage() {
       <Card sx={DETAILS_CARD_SX}>
         <Box sx={DETAILS_IMAGE_WRAPPER_SX}>
           <CardMedia
-            component="img"
+            component={'img'}
             image={product.imageUrl}
             alt={product.name}
             sx={DETAILS_IMAGE_SX}
           />
         </Box>
         <Box sx={DETAILS_CONTENT_SX}>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+          <Typography variant={'h4'} fontWeight={'bold'} gutterBottom>
             {product.name}
           </Typography>
           <Divider sx={{ my: 2 }} />
-          <Typography variant="h5" color="primary" fontWeight="bold" gutterBottom>
+          <Typography variant={'h5'} color={'primary'} fontWeight={'bold'} gutterBottom>
             {product.price} {product.currency}
           </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
+          <Typography variant={'body1'} sx={{ mb: 2 }}>
             {product.description}
           </Typography>
           <Chip
@@ -68,14 +73,15 @@ export function ProductDetailsPage() {
           />
           <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
             <Typography sx={{ mr: 2 }}>Quantity:</Typography>
-            <TextField type="number" size="small" defaultValue={1} sx={{ mr: 2 }} />
+            <Typography sx={{ mr: 2, fontWeight: 'bold' }}>{quantityInCart}</Typography>
             <Button
-              variant="contained"
-              color="success"
+              variant={'contained'}
+              color={'success'}
               startIcon={<ShoppingCartIcon />}
               disabled={!product.inStock}
+              onClick={() => addToCart(product)}
             >
-              Add to Cart
+              Add To Cart
             </Button>
           </Box>
         </Box>
