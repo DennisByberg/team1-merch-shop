@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Product } from '../types/globalTypes';
 import {
   Card,
   CardContent,
@@ -14,8 +13,9 @@ import {
   SxProps,
   Theme,
 } from '@mui/material';
-import { fetchProducts } from '../api/productApi';
-import { useCart } from '../hooks/useCart';
+import { useCart } from '../../hooks/useCart';
+import { fetchProducts } from '../../api/productApi';
+import { Product } from '../../types/globalTypes';
 
 export function ProductCatalog() {
   const [products, setProducts] = useState<Product[]>([]);

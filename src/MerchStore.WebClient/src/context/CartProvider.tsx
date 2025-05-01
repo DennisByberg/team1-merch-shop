@@ -28,11 +28,39 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }
 
-  // Function to get the total product count in the cart
+  function increaseQuantity(id: string) {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  }
+
+  function decreaseQuantity(id: string) {
+    setItems((prev) =>
+      prev
+        .map((item) => (item.id === id ? { ...item, quantity: item.quantity - 1 } : item))
+        .filter((item) => item.quantity > 0)
+    );
+  }
+
+  function removeItem(id: string) {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  }
+
   const getTotalProductCount = () => items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, getTotalProductCount }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        increaseQuantity,
+        decreaseQuantity,
+        removeItem,
+        getTotalProductCount,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

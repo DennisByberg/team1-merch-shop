@@ -1,5 +1,5 @@
 import { Container, SxProps, Theme, Typography } from '@mui/material';
-import { ProductCatalog } from '../components/ProductCatalog';
+import { ProductCatalog } from '../components/Store/ProductCatalog';
 
 const STORE_TITLE = 'Featured Products';
 

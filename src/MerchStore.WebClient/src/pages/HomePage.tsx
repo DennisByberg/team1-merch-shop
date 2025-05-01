@@ -1,9 +1,9 @@
 import { Box, Typography, SxProps, Theme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import soundwavesPNG from '../assets/soundwaves.png';
-import BrandRedButton from '../components/BrandRedButton';
+import BrandRedButton from '../components/Buttons/BrandRedButton';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ProductSlider from '../components/ProductSlider';
+import ProductSlider from '../components/Store/ProductSlider';
 
 export default function HomePage() {
   const HERO_TITLE = 'ECHOCRAFT';
