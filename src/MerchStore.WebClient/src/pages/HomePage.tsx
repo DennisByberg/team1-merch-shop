@@ -1,9 +1,9 @@
 import { Box, Typography, SxProps, Theme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import soundwavesPNG from '../assets/soundwaves.png';
-import BrandRedButton from '../components/BrandRedButton';
+import BrandRedButton from '../components/Buttons/BrandRedButton';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ProductSlider from '../components/ProductSlider';
+import ProductSlider from '../components/Store/ProductSlider';
 
 export default function HomePage() {
   const HERO_TITLE = 'ECHOCRAFT';
@@ -14,16 +14,10 @@ export default function HomePage() {
       <Box sx={HERO_CONTAINER_SX}>
         <Box sx={HERO_BG_OVERLAY_SX} />
         <Box sx={HERO_CONTENT_SX}>
-          <Typography
-            variant={'h2'}
-            component={'h1'}
-            fontWeight={'bold'}
-            mb={3}
-            color={'text.primary'}
-          >
+          <Typography variant={'h1'} fontSize={70} fontWeight={'bold'}>
             {HERO_TITLE}
           </Typography>
-          <Typography variant={'h5'} mb={4} color={'text.secondary'}>
+          <Typography variant={'h5'} color={'text.secondary'}>
             {HERO_TAGLINE}
           </Typography>
           <BrandRedButton
@@ -67,4 +61,8 @@ const HERO_BG_OVERLAY_SX: SxProps<Theme> = {
 const HERO_CONTENT_SX: SxProps<Theme> = {
   position: 'relative',
   zIndex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 3,
+  alignItems: 'center',
 };

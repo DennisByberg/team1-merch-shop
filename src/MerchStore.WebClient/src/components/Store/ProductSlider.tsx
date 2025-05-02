@@ -1,7 +1,5 @@
 import Slider from 'react-slick';
 import { useEffect, useState } from 'react';
-import { Product } from '../types/globalTypes';
-import { fetchProducts } from '../api/productApi';
 import {
   Box,
   CardMedia,
@@ -10,6 +8,8 @@ import {
   CircularProgress,
   Typography,
 } from '@mui/material';
+import { Product } from '../../types/globalTypes';
+import { fetchProducts } from '../../api/productApi';
 
 export default function ProductSlider() {
   const [products, setProducts] = useState<Product[]>([]);

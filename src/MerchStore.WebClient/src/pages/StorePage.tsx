@@ -1,16 +1,16 @@
-import { Container, SxProps, Theme, Typography } from '@mui/material';
-import { ProductCatalog } from '../components/ProductCatalog';
-
-const STORE_TITLE = 'Featured Products';
+import { Box, SxProps, Theme, Typography } from '@mui/material';
+import { ProductCatalog } from '../components/Store/ProductCatalog';
 
 export default function StorePage() {
+  const STORE_TITLE = 'Featured Products';
+
   return (
-    <Container>
-      <Typography variant="h5" fontWeight="bold" sx={STORE_TITLE_SX}>
+    <Box>
+      <Typography variant={'h5'} fontWeight={'bold'} sx={STORE_TITLE_SX}>
         {STORE_TITLE}
       </Typography>
       <ProductCatalog />
-    </Container>
+    </Box>
   );
 }
 

@@ -15,6 +15,8 @@ import Footer from './components/Footer';
 import { ProductDetailsPage } from './pages/ProductDetailsPage';
 import { useSystemDarkMode } from './hooks/useSystemDarkMode';
 import { getAppTheme } from './theme/theme';
+import { CartProvider } from './context/CartProvider';
+import CartPage from './pages/CartPage';
 
 export default function App() {
   const [darkMode, setDarkMode] = useSystemDarkMode();
@@ -23,19 +25,22 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container sx={APP_CONTAINER_SX}>
-        <BrowserRouter>
-          <Header darkMode={darkMode} onToggleDarkMode={() => setDarkMode((v) => !v)} />
-          <Box sx={APP_CONTENT_SX}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/product" element={<StorePage />} />
-              <Route path="/product/:id" element={<ProductDetailsPage />} />
-            </Routes>
-          </Box>
-          <Footer />
-        </BrowserRouter>
-      </Container>
+      <CartProvider>
+        <Container sx={APP_CONTAINER_SX}>
+          <BrowserRouter>
+            <Header darkMode={darkMode} onToggleDarkMode={() => setDarkMode((v) => !v)} />
+            <Box sx={APP_CONTENT_SX}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/product" element={<StorePage />} />
+                <Route path="/product/:id" element={<ProductDetailsPage />} />
+                <Route path="/cart" element={<CartPage />} />
+              </Routes>
+            </Box>
+            <Footer />
+          </BrowserRouter>
+        </Container>
+      </CartProvider>
     </ThemeProvider>
   );
 }

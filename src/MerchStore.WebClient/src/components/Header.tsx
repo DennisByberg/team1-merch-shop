@@ -15,12 +15,13 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import LINKS_DATA from '../data/linksData';
 import logoPNG from '../assets/logo.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { SxProps, Theme, useTheme } from '@mui/material';
+import { Badge, SxProps, Theme, useTheme } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import { useIsTopScroll } from '../hooks/useIsTopScroll';
+import { useCart } from '../hooks/useCart';
 
 type HeaderProps = {
   darkMode: boolean;
@@ -30,6 +31,8 @@ type HeaderProps = {
 export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isTop = useIsTopScroll();
+  const { getTotalProductCount } = useCart();
+  const navigate = useNavigate();
 
   // Only show Home and Catalog in the left section
   const leftLinks = LINKS_DATA.filter(
@@ -107,10 +110,18 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
             >
               {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
-            <IconButton title={'Cart'} color="inherit" component={Link} to="/cart">
-              <ShoppingCartIcon />
+            <IconButton
+              onClick={() => navigate('/cart')}
+              title={'Cart'}
+              color="inherit"
+              component={Link}
+              to="/cart"
+            >
+              <Badge badgeContent={getTotalProductCount()} color="error">
+                <ShoppingCartIcon />
+              </Badge>
             </IconButton>
-            <IconButton title={'Login'} color="inherit" component={Link} to="/login">
+            <IconButton title={'Login'} color="inherit">
               <LoginIcon />
             </IconButton>
           </Box>
