@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Card,
@@ -8,85 +7,82 @@ import {
   CardActions,
   Button,
   Chip,
-  Container,
   Box,
   SxProps,
   Theme,
 } from '@mui/material';
 import { useCart } from '../../hooks/useCart';
-import { fetchProducts } from '../../api/productApi';
-import { Product } from '../../types/globalTypes';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useProducts } from '../../hooks/useProducts';
+import CustomSpinner from '../CustomSpinner';
 
 export function ProductCatalog() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const { products, loading } = useProducts();
   const { addToCart } = useCart();
 
-  useEffect(() => {
-    fetchProducts()
-      .then(setProducts)
-      .catch((error) => {
-        console.error('Failed to fetch products:', error);
-      });
-  }, []);
-
-  if (!products) return <Box>Loading...</Box>;
-
   return (
-    <Container>
-      <Box sx={CATALOG_CONTAINER_SX}>
-        {products.map((product) => (
-          <Card key={product.id} sx={PRODUCT_CARD_SX}>
-            {product.imageUrl && (
-              <CardMedia
-                component={'img'}
-                height="180"
-                image={product.imageUrl}
-                alt={product.name}
-                sx={PRODUCT_IMAGE_SX}
-              />
-            )}
-            <CardContent sx={PRODUCT_CONTENT_SX}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                {product.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {product.description}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 1 }}>
-                {product.price} {product.currency}
-              </Typography>
-              <Chip
-                label={product.inStock ? 'In Stock' : 'Out of Stock'}
-                color={product.inStock ? 'success' : 'default'}
-                size={'small'}
-                sx={{ mt: 1 }}
-              />
-            </CardContent>
-            <CardActions sx={PRODUCT_ACTIONS_SX}>
-              <Button
-                component={Link}
-                to={`/product/${product.id}`}
-                variant={'outlined'}
-                color={'primary'}
-                size={'small'}
-              >
-                View Details
-              </Button>
-              <Button
-                variant={'contained'}
-                color={'primary'}
-                size={'small'}
-                disabled={!product.inStock}
-                sx={{ ml: 1 }}
-                onClick={() => addToCart(product)}
-              >
-                Add To Cart
-              </Button>
-            </CardActions>
-          </Card>
-        ))}
-      </Box>
-    </Container>
+    <Box>
+      {loading ? (
+        <CustomSpinner text="Fetching products from the back of the store..." />
+      ) : (
+        <Box sx={CATALOG_CONTAINER_SX}>
+          {products.map((product) => (
+            <Card key={product.id} sx={PRODUCT_CARD_SX}>
+              {product.imageUrl && (
+                <CardMedia
+                  component={'img'}
+                  height="180"
+                  image={product.imageUrl}
+                  alt={product.name}
+                  sx={PRODUCT_IMAGE_SX}
+                />
+              )}
+              <CardContent sx={PRODUCT_CONTENT_SX}>
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                  {product.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  {product.description}
+                </Typography>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 1 }}>
+                  {product.price} {product.currency}
+                </Typography>
+                <Chip
+                  label={product.inStock ? 'In Stock' : 'Out of Stock'}
+                  color={product.inStock ? 'success' : 'default'}
+                  size={'small'}
+                  sx={{ mt: 1 }}
+                />
+              </CardContent>
+              <CardActions sx={PRODUCT_ACTIONS_SX}>
+                <Button
+                  component={Link}
+                  to={`/store/${product.id}`}
+                  startIcon={<VisibilityIcon />}
+                  variant={'outlined'}
+                  color={'inherit'}
+                  size={'small'}
+                >
+                  View Details
+                </Button>
+                <Button
+                  variant={'contained'}
+                  startIcon={<ShoppingCartIcon />}
+                  color={'success'}
+                  size={'small'}
+                  disabled={!product.inStock}
+                  sx={{ ml: 1 }}
+                  onClick={() => addToCart(product)}
+                >
+                  Add To Cart
+                </Button>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      )}
+    </Box>
   );
 }
 

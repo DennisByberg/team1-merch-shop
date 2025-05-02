@@ -23,16 +23,13 @@ export function CartEmpty() {
 
 /*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
 const CART_EMPTY_STYLE: SxProps<Theme> = {
-  mt: 6,
-  width: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   minHeight: 200,
-  border: '1px dashed #888',
   borderRadius: 2,
-  background: 'rgba(255,255,255,0.02)',
+  background: grey[900],
   textAlign: 'center',
   color: grey[700],
   pb: 2,

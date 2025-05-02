@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Product } from '../types/globalTypes';
-import { Box, SxProps, Theme, IconButton } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { fetchProduct } from '../api/productApi';
 import { useCart } from '../hooks/useCart';
 import { ProductDetailsCard } from '../components/Store/ProductDetailsCard';
+import PageBreadcrumbs from '../components/PageBreadcrumbs';
 
 export function ProductDetailsPage() {
   const [product, setProduct] = useState<Product | null>(null);
@@ -16,6 +17,8 @@ export function ProductDetailsPage() {
 
   const cartItem = items.find((item) => item.id === product?.id);
   const quantityInCart = cartItem ? cartItem.quantity : 0;
+
+  const CONTINUE_SHOPPING_TEXT = 'Continue shopping';
 
   useEffect(() => {
     if (!id) return;
@@ -30,24 +33,22 @@ export function ProductDetailsPage() {
   if (!product) return <Box>Loading...</Box>;
 
   return (
-    <Box sx={DETAILS_PAGE_SX}>
-      <IconButton sx={{ mb: 2 }} onClick={() => navigate(-1)} aria-label="Go back">
-        <ArrowBackIcon />
-      </IconButton>
+    <Box>
+      <PageBreadcrumbs productName={product?.name} />
       <ProductDetailsCard
         product={product}
         quantityInCart={quantityInCart}
         addToCart={addToCart}
       />
+      <Button
+        sx={{ mt: 2 }}
+        color={'inherit'}
+        variant={'outlined'}
+        startIcon={<ArrowBackIcon />}
+        onClick={() => navigate(-1)}
+      >
+        {CONTINUE_SHOPPING_TEXT}
+      </Button>
     </Box>
   );
 }
-
-//━━━━━━━━━━━━ Styling ━━━━━━━━━━━━
-const DETAILS_PAGE_SX: SxProps<Theme> = {
-  maxWidth: 900,
-  mx: 'auto',
-  mt: 10,
-  mb: { xs: 3, md: 6 },
-  px: { xs: 0.5, sm: 2 },
-};
