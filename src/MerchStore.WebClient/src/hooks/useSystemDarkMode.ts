@@ -1,16 +1,25 @@
 import { useEffect, useState } from 'react';
 
 export function useSystemDarkMode() {
-  const [darkMode, setDarkMode] = useState(
+  // State to track if system prefers dark mode
+  const [isDarkMode, setIsDarkMode] = useState(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches
   );
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e: MediaQueryListEvent) => setDarkMode(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    // MediaQueryList for dark mode preference
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // Handler to update state when system preference changes
+    const handleChange = (event: MediaQueryListEvent) => setIsDarkMode(event.matches);
+
+    // Listen for changes in system color scheme
+    mediaQuery.addEventListener('change', handleChange);
+
+    // Clean up event listener on unmount
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  return [darkMode, setDarkMode] as const;
+  // Return current dark mode state and setter
+  return [isDarkMode, setIsDarkMode] as const;
 }

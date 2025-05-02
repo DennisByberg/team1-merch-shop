@@ -16,6 +16,7 @@ import { ProductDetailsPage } from './pages/ProductDetailsPage';
 import { useSystemDarkMode } from './hooks/useSystemDarkMode';
 import { getAppTheme } from './theme/theme';
 import { CartProvider } from './context/CartProvider';
+import CartPage from './pages/CartPage';
 
 export default function App() {
   const [darkMode, setDarkMode] = useSystemDarkMode();
@@ -33,6 +34,7 @@ export default function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/product" element={<StorePage />} />
                 <Route path="/product/:id" element={<ProductDetailsPage />} />
+                <Route path="/cart" element={<CartPage />} />
               </Routes>
             </Box>
             <Footer />
