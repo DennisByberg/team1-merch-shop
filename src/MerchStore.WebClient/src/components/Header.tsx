@@ -121,7 +121,7 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
-            <IconButton title={'Login'} color="inherit" component={Link} to="/login">
+            <IconButton title={'Login'} color="inherit">
               <LoginIcon />
             </IconButton>
           </Box>

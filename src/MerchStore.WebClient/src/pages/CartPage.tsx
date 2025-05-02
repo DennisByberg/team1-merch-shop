@@ -1,24 +1,28 @@
-import { Container, Typography } from '@mui/material';
+import { Typography, SxProps, Theme, Box } from '@mui/material';
 import { useCart } from '../hooks/useCart';
 import { CartItemList } from '../components/Cart/CartItemList';
 
-function CartPage() {
+export default function CartPage() {
   const { items, increaseQuantity, decreaseQuantity, removeItem } = useCart();
-  console.log(items);
+  const CART_TITLE = 'Your Shopping Cart';
 
   return (
-    <Container
-      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start', mt: 10 }}
-    >
-      <Typography variant={'h4'}>Your Shopping Cart</Typography>
+    <Box sx={CART_PAGE_STYLE}>
+      <Typography variant={'h4'}>{CART_TITLE}</Typography>
       <CartItemList
         items={items}
         onIncrease={increaseQuantity}
         onDecrease={decreaseQuantity}
         onRemove={removeItem}
       />
-    </Container>
+    </Box>
   );
 }
 
-export default CartPage;
+/*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
+const CART_PAGE_STYLE: SxProps<Theme> = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'start',
+  mt: 10,
+};
