@@ -16,27 +16,20 @@ import { useState } from 'react';
 import LINKS_DATA from '../data/linksData';
 import logoPNG from '../assets/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { Badge, SxProps, Theme, useTheme } from '@mui/material';
+import { Badge, Container, SxProps, Theme } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import { useIsTopScroll } from '../hooks/useIsTopScroll';
 import { useCart } from '../hooks/useCart';
 
-type HeaderProps = {
-  darkMode: boolean;
-  onToggleDarkMode: () => void;
-};
-
-export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
+export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isTop = useIsTopScroll();
   const { getTotalProductCount } = useCart();
   const navigate = useNavigate();
 
-  // Only show Home and Catalog in the left section
+  // Links data for the left section of the header
   const leftLinks = LINKS_DATA.filter(
-    (link) => link.name === 'Home' || link.name === 'Store'
+    (link) => link.name === LINKS_DATA[0].name || LINKS_DATA[1].name
   );
 
   const drawer = (
@@ -65,67 +58,66 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
         animate={{ y: 0, opacity: 1 }}
         sx={isTop ? HEADER_APP_BAR_STYLE_TOP : HEADER_APP_BAR_STYLE}
       >
-        <Toolbar sx={{ pl: 0, pt: 1 }}>
-          {/* Hamburger menu for mobile (left) */}
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge={false}
-            onClick={() => setMobileOpen((prevState) => !prevState)}
-            sx={{ mr: 2, display: { xs: 'flex', md: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-
-          {/* Left section: Logo + Home/Catalog (center/left on desktop) */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-            <Box
-              component={Link}
-              to={'/'}
-              sx={{ display: { xs: 'none', md: 'block' }, mr: 2 }}
+        <Container maxWidth="lg" disableGutters>
+          <Toolbar sx={{ pl: 0, pt: 1 }}>
+            {/* Hamburger menu for mobile */}
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge={false}
+              onClick={() => setMobileOpen((prevState) => !prevState)}
+              sx={{ mr: 2, display: { xs: 'flex', md: 'none' } }}
             >
-              <Box component={'img'} sx={{ width: 55 }} alt="Logo" src={logoPNG} />
-            </Box>
-            {leftLinks.map((link) => (
-              <Box component={Link} to={link.hash} key={link.name} sx={HEADER_LINK_STYLE}>
-                {link.name}
+              <MenuIcon />
+            </IconButton>
+
+            {/* Left section: */}
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
+              <Box
+                component={Link}
+                to={'/'}
+                sx={{ display: { xs: 'none', md: 'block' }, mr: 2 }}
+              >
+                <Box component={'img'} sx={{ width: 55 }} alt="Logo" src={logoPNG} />
               </Box>
-            ))}
-          </Box>
+              {leftLinks.map((link) => (
+                <Box
+                  component={Link}
+                  to={link.hash}
+                  key={link.name}
+                  sx={HEADER_LINK_STYLE}
+                >
+                  {link.name}
+                </Box>
+              ))}
+            </Box>
 
-          {/* Right section: Dark mode, Cart & Login (always right) */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0,
-              ml: 'auto',
-            }}
-          >
-            <IconButton
-              sx={{ mr: 1 }}
-              color="inherit"
-              onClick={onToggleDarkMode}
-              title="Toggle dark mode"
+            {/* Right section*/}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0,
+                ml: 'auto',
+              }}
             >
-              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-            <IconButton
-              onClick={() => navigate('/cart')}
-              title={'Cart'}
-              color="inherit"
-              component={Link}
-              to="/cart"
-            >
-              <Badge badgeContent={getTotalProductCount()} color="error">
-                <ShoppingCartIcon />
-              </Badge>
-            </IconButton>
-            <IconButton title={'Login'} color="inherit">
-              <LoginIcon />
-            </IconButton>
-          </Box>
-        </Toolbar>
+              <IconButton
+                onClick={() => navigate('/cart')}
+                title={'Cart'}
+                color={'inherit'}
+                component={Link}
+                to="/cart"
+              >
+                <Badge badgeContent={getTotalProductCount()} color="error">
+                  <ShoppingCartIcon />
+                </Badge>
+              </IconButton>
+              <IconButton title={'Login'} color="inherit">
+                <LoginIcon />
+              </IconButton>
+            </Box>
+          </Toolbar>
+        </Container>
       </AppBar>
       <Box component={'nav'}>
         <Drawer
@@ -148,38 +140,26 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
 }
 
 /*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
-const HEADER_APP_BAR_STYLE_TOP: SxProps<Theme> = () => {
-  const theme = useTheme();
-
-  return {
-    background: 'none',
-    color: theme.palette.mode === 'light' ? grey[900] : grey[50],
-    boxShadow: 'none',
-  };
+const HEADER_APP_BAR_STYLE_TOP: SxProps<Theme> = {
+  background: 'none',
+  color: grey[50],
+  boxShadow: 'none',
 };
 
-const HEADER_APP_BAR_STYLE: SxProps<Theme> = () => {
-  const theme = useTheme();
-
-  return {
-    background: 'transparent',
-    backdropFilter: 'blur(14px)',
-    color: theme.palette.mode === 'light' ? grey[900] : grey[50],
-    boxShadow: theme.palette.mode === 'light' ? '0px 0px 4px black' : '0px 0px 4px white',
-  };
+const HEADER_APP_BAR_STYLE: SxProps<Theme> = {
+  background: 'transparent',
+  backdropFilter: 'blur(14px)',
+  color: grey[50],
+  boxShadow: '0px 0px 4px white',
 };
 
-const HEADER_LINK_STYLE: SxProps<Theme> = () => {
-  const theme = useTheme();
+const HEADER_LINK_STYLE: SxProps<Theme> = {
+  transition: '150ms',
+  m: 2,
+  textDecoration: 'none',
+  color: grey[50],
 
-  return {
-    transition: '150ms',
-    m: 2,
-    textDecoration: 'none',
-    color: theme.palette.mode === 'light' ? grey[900] : grey[50],
-
-    '&:hover': {
-      color: grey[500],
-    },
-  };
+  '&:hover': {
+    color: grey[500],
+  },
 };

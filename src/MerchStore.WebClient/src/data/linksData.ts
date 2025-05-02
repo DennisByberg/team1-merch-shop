@@ -5,7 +5,7 @@ const LINKS_DATA = [
   },
   {
     name: 'Store',
-    hash: 'product',
+    hash: 'store',
   },
 ] as const;
 

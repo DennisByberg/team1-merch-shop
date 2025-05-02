@@ -1,7 +1,6 @@
-import { Box, Typography, SxProps, Theme } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Box, Typography, SxProps, Theme, Button } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import soundwavesPNG from '../assets/soundwaves.png';
-import BrandRedButton from '../components/Buttons/BrandRedButton';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ProductSlider from '../components/Store/ProductSlider';
 
@@ -20,14 +19,15 @@ export default function HomePage() {
           <Typography variant={'h5'} color={'text.secondary'}>
             {HERO_TAGLINE}
           </Typography>
-          <BrandRedButton
-            component={Link}
-            to={'/product'}
+          <Button
+            color={'error'}
+            component={RouterLink}
+            to={'/store'}
             variant={'contained'}
             size={'large'}
           >
             Explore Now <ArrowForwardIcon style={{ marginLeft: 8 }} />
-          </BrandRedButton>
+          </Button>
         </Box>
       </Box>
       <ProductSlider />
@@ -43,7 +43,6 @@ const HERO_CONTAINER_SX: SxProps<Theme> = {
   minHeight: '60vh',
   textAlign: 'center',
   overflow: 'hidden',
-  maxWidth: 1080,
   mx: 'auto',
 };
 

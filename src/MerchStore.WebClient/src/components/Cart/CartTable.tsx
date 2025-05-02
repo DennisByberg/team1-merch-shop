@@ -15,15 +15,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { CartItem } from '../../context/CartProvider';
+import { grey } from '@mui/material/colors';
 
-interface ICartTableProps {
+type CartTableProps = {
   items: CartItem[];
   onRemove?: (id: string) => void;
   onIncrease?: (id: string) => void;
   onDecrease?: (id: string) => void;
-}
+};
 
-export function CartTable(props: ICartTableProps) {
+export function CartTable(props: CartTableProps) {
   const total = props.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
@@ -31,9 +32,8 @@ export function CartTable(props: ICartTableProps) {
       sx={{
         mt: 2,
         width: '100%',
-        border: '1px dashed #888',
         borderRadius: 2,
-        background: 'rgba(255,255,255,0.02)',
+        background: grey[900],
         p: 0,
       }}
     >
@@ -105,7 +105,11 @@ export function CartTable(props: ICartTableProps) {
                 </TableCell>
               </TableRow>
             ))}
-            <TableRow>
+            <TableRow
+              sx={{
+                '& td, & th': { borderBottom: 'none' },
+              }}
+            >
               <TableCell colSpan={3} align="right"></TableCell>
               <TableCell align="right">
                 <Typography component={'p'}>
