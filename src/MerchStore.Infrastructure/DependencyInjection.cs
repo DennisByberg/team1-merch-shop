@@ -13,9 +13,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // Byt till SQLite
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContext<AppDbContext>(opt => 
+            opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
 
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();

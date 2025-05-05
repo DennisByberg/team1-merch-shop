@@ -18,47 +18,45 @@ type ProductDetailsCardProps = {
   addToCart: (product: Product) => void;
 };
 
-export function ProductDetailsCard({
-  product,
-  quantityInCart,
-  addToCart,
-}: ProductDetailsCardProps) {
+export function ProductDetailsCard(props: ProductDetailsCardProps) {
   return (
     <Card sx={DETAILS_CARD_SX}>
       <Box sx={DETAILS_IMAGE_WRAPPER_SX}>
         <CardMedia
           component={'img'}
-          image={product.imageUrl}
-          alt={product.name}
+          image={props.product.imageUrl}
+          alt={props.product.name}
           sx={DETAILS_IMAGE_SX}
         />
       </Box>
       <Box sx={DETAILS_CONTENT_SX}>
         <Typography variant={'h4'} fontWeight={'bold'} gutterBottom>
-          {product.name}
+          {props.product.name}
         </Typography>
         <Divider sx={{ my: 2 }} />
         <Typography variant={'h5'} color={'primary'} fontWeight={'bold'} gutterBottom>
-          {product.price} {product.currency}
+          {props.product.price} {props.product.currency}
         </Typography>
         <Typography variant={'body1'} sx={{ mb: 2 }}>
-          {product.description}
+          {props.product.description}
         </Typography>
         <Chip
-          label={product.inStock ? 'In Stock' : 'Out of Stock'}
-          color={product.inStock ? 'success' : 'default'}
+          label={props.product.inStock ? 'In Stock' : 'Out of Stock'}
+          color={props.product.inStock ? 'success' : 'default'}
           size="small"
           sx={{ mb: 2 }}
         />
         <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
           <Typography sx={{ mr: 2 }}>Quantity:</Typography>
-          <Typography sx={{ mr: 2, fontWeight: 'bold' }}>{quantityInCart}</Typography>
+          <Typography sx={{ mr: 2, fontWeight: 'bold' }}>
+            {props.quantityInCart}
+          </Typography>
           <Button
             variant={'contained'}
             color={'success'}
             startIcon={<ShoppingCartIcon />}
-            disabled={!product.inStock}
-            onClick={() => addToCart(product)}
+            disabled={!props.product.inStock}
+            onClick={() => props.addToCart(props.product)}
           >
             Add To Cart
           </Button>

@@ -1,57 +1,36 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import { useMemo } from 'react';
-import {
-  ThemeProvider,
-  CssBaseline,
-  Container,
-  Box,
-  SxProps,
-  Theme,
-} from '@mui/material';
+import { ThemeProvider, CssBaseline, Container, createTheme } from '@mui/material';
 import Header from './components/Header';
 import StorePage from './pages/StorePage';
-import Footer from './components/Footer';
 import { ProductDetailsPage } from './pages/ProductDetailsPage';
-import { useSystemDarkMode } from './hooks/useSystemDarkMode';
-import { getAppTheme } from './theme/theme';
 import { CartProvider } from './context/CartProvider';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import { ProductProvider } from './context/ProductProvider';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
 
 export default function App() {
-  const [darkMode, setDarkMode] = useSystemDarkMode();
-  const theme = useMemo(() => getAppTheme(darkMode), [darkMode]);
-
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={createTheme({ palette: { mode: 'dark' } })}>
       <CssBaseline />
       <CartProvider>
-        <Container sx={APP_CONTAINER_SX}>
+        <ProductProvider>
           <BrowserRouter>
-            <Header darkMode={darkMode} onToggleDarkMode={() => setDarkMode((v) => !v)} />
-            <Box sx={APP_CONTENT_SX}>
+            <Container maxWidth={'lg'} sx={{ pb: 2 }}>
+              <Header />
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/product" element={<StorePage />} />
-                <Route path="/product/:id" element={<ProductDetailsPage />} />
+                <Route path="/store" element={<StorePage />} />
+                <Route path="/store/:id" element={<ProductDetailsPage />} />
                 <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
               </Routes>
-            </Box>
-            <Footer />
+            </Container>
           </BrowserRouter>
-        </Container>
+        </ProductProvider>
       </CartProvider>
     </ThemeProvider>
   );
 }
-
-/*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
-const APP_CONTAINER_SX: SxProps<Theme> = {
-  display: 'flex',
-  flexDirection: 'column',
-  minHeight: '100vh',
-};
-
-const APP_CONTENT_SX: SxProps<Theme> = {
-  flex: 1,
-};

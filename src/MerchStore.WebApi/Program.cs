@@ -4,9 +4,18 @@ using MerchStore.Application;
 using MerchStore.Infrastructure;
 using MerchStore.WebApi.Authentication.ApiKey;
 using Microsoft.OpenApi.Models;
+using Azure.Identity;
+using MerchStore.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 // Create and configure the WebApplication for MerchStore API
 var builder = WebApplication.CreateBuilder(args);
+
+var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
+builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add support for controllers (API endpoints)
 builder.Services.AddControllers();

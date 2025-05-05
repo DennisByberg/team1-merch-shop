@@ -42,7 +42,7 @@ export default function ProductSlider() {
       {loading ? (
         <Box sx={LOADING_BOX_SX}>
           <CircularProgress color={'inherit'} />
-          <Typography variant={'body2'} mt={2} color={'text.secondary'}>
+          <Typography variant={'body2'} color={'text.secondary'}>
             {LOADING_TEXT}
           </Typography>
         </Box>
@@ -76,24 +76,17 @@ const SLIDER_WRAPPER_SX: SxProps<Theme> = {
   right: '50%',
   ml: '-50vw',
   mr: '-50vw',
-  overflow: 'hidden',
-  background: 'transparent',
 };
 
 const SLIDE_ITEM_SX: SxProps<Theme> = {
-  background: 'rgba(0,0,0,0.1)',
+  background: 'rgba(0,0,0,0.13)',
 };
 
 const IMAGE_SX: SxProps<Theme> = {
-  maxWidth: 300,
   maxHeight: 180,
   objectFit: 'contain',
 };
 
 const LOADING_BOX_SX: SxProps<Theme> = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: 220,
+  textAlign: 'center',
 };
