@@ -113,11 +113,11 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "MerchStore API V1");
 });
 
-app.UseHttpsRedirection(); // Redirect HTTP requests to HTTPS
+app.UseHttpsRedirection();      // Redirect HTTP requests to HTTPS
 app.UseCors("AllowAllOrigins"); // Enable CORS policy
-app.UseAuthentication(); // Enable authentication middleware
-app.UseAuthorization(); // Enable authentication and authorization middleware
-app.MapControllers(); // Map API controllers
+app.UseAuthentication();        // Enable authentication middleware
+app.UseAuthorization();         // Enable authentication and authorization middleware
+app.MapControllers();           // Map API controllers
 
 // Redirect root URL to Swagger UI
 app.MapGet("/", context =>
