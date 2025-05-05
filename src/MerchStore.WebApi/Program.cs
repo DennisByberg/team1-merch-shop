@@ -103,9 +103,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline for the application
 if (app.Environment.IsDevelopment())
 {
+    // Seed the database with initial data in development mode
+    app.Services.SeedDatabaseAsync().Wait();
 }
-// Seed the database with initial data in development mode
-app.Services.SeedDatabaseAsync().Wait();
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>
