@@ -11,8 +11,13 @@ using Microsoft.EntityFrameworkCore;
 // Create and configure the WebApplication for MerchStore API
 var builder = WebApplication.CreateBuilder(args);
 
-var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
-builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+// Lägg endast till Azure Key Vault-konfiguration om applikationen körs i produktionsmiljö.
+// Detta gör att lokala och Docker-körningar använder appsettings.Development.json och miljövariabler istället.
+if (builder.Environment.IsProduction())
+{
+    var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
+    builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+}
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -103,9 +108,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline for the application
 if (app.Environment.IsDevelopment())
 {
+    // Seed the database with initial data in development mode
+    app.Services.SeedDatabaseAsync().Wait();
 }
-// Seed the database with initial data in development mode
-app.Services.SeedDatabaseAsync().Wait();
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>
@@ -113,11 +118,11 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "MerchStore API V1");
 });
 
-app.UseHttpsRedirection(); // Redirect HTTP requests to HTTPS
+app.UseHttpsRedirection();      // Redirect HTTP requests to HTTPS
 app.UseCors("AllowAllOrigins"); // Enable CORS policy
-app.UseAuthentication(); // Enable authentication middleware
-app.UseAuthorization(); // Enable authentication and authorization middleware
-app.MapControllers(); // Map API controllers
+app.UseAuthentication();        // Enable authentication middleware
+app.UseAuthorization();         // Enable authentication and authorization middleware
+app.MapControllers();           // Map API controllers
 
 // Redirect root URL to Swagger UI
 app.MapGet("/", context =>

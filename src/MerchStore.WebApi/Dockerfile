@@ -10,4 +10,5 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
+
 ENTRYPOINT ["dotnet", "MerchStore.WebApi.dll"]
