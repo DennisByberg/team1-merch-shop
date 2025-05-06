@@ -17,9 +17,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Link as RouterLink } from 'react-router-dom';
 import { grey } from '@mui/material/colors';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid'; // Lägg till denna import överst (kräver 'uuid' installerat)
+import { Order, OrderItem } from '../types/globalTypes';
 
 export default function CheckoutPage() {
-  const { items } = useCart();
+  const { items, removeItem } = useCart();
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -36,9 +38,48 @@ export default function CheckoutPage() {
     setForm({ ...form, [event.target.name]: event.target.value });
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  // Empty the cart
+  const handleClearCart = () => {
+    items.forEach((item) => {
+      removeItem(item.id);
+    });
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    navigate('/order-confirmation');
+    try {
+      // Skapa en fake order
+      const fakeOrder: Order = {
+        id: uuidv4(),
+        fullName: form.fullName,
+        email: form.email,
+        street: form.street,
+        city: form.city,
+        postalCode: form.postalCode,
+        country: form.country,
+        orderStatus: 'Pending', // eller annan defaultstatus
+      };
+
+      // Skapa OrderItems för varje produkt i varukorgen
+      const fakeOrderItems: OrderItem[] = items.map((item) => ({
+        id: uuidv4(),
+        orderId: fakeOrder.id,
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        currency: item.currency,
+      }));
+
+      // Töm varukorgen efter ordern har lagts
+      handleClearCart();
+
+      // Navigera till confirmation och skicka med ordern och orderItems
+      navigate('/order-confirmation', {
+        state: { order: fakeOrder, orderItems: fakeOrderItems },
+      });
+    } catch {
+      alert('Ordern kunde inte skickas.');
+    }
   };
 
   return (
