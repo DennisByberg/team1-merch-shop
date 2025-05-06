@@ -62,4 +62,5 @@ jobs:
           az containerapp update \
             --name merchstorefrontend \
             --resource-group MerchStoreRG \
-            --image ${{ secrets.DOCKERHUB_USERNAME }}/merch-store-frontend:latest
+            --image ${{ secrets.DOCKERHUB_USERNAME }}/merch-store-frontend:latest \
+            --set-env-vars VITE_API_URL=${{ secrets.VITE_API_URL }}
