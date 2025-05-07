@@ -1,0 +1,137 @@
+using MerchStore.Domain.Common;
+
+namespace MerchStore.Domain.Entities;
+
+public class Order : Entity<Guid>
+{
+    public Guid Id { get; private set; } = Guid.NewGuid();
+    public string FullName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public string Street { get; private set; } = string.Empty;
+    public string PostalCode { get; private set; } = string.Empty;
+    public string City { get; private set; } = string.Empty;
+    public string Country { get; private set; } = string.Empty; 
+    public string OrderStatus { get; private set; } = string.Empty;
+   public ICollection<OrderProducts> Product { get; set; } = new List<OrderProducts>();
+
+    private Order()
+    {
+    } // Privat parameterlös konstruktor för EF Core
+    public Order(
+        string fullName,
+        string email,
+        string street,
+        string postalCode,
+        string city,
+        string country,
+        string orderStatus,
+        ICollection<OrderProducts> products
+    ) : base(Guid.NewGuid())
+    {
+        ValidateFullName(fullName);
+        ValidateStreet(street);
+        ValidateProducts(products);
+        ValidateEmail(email);
+        ValidateCity(city);
+        ValidatePostalCode(postalCode);
+        ValidateCountry(country);
+
+        FullName = fullName;
+        Email = email;
+        Street = street;
+        PostalCode = postalCode;
+        City = city;
+        Country = country;
+        OrderStatus = orderStatus;  // du sätter detta även om du defaultar till "Pending" annars
+        Product = products;
+    }
+
+    private void ValidateProducts(ICollection<OrderProducts> products)
+    {
+        if (products == null || products.Count == 0)
+        {
+            throw new ArgumentException("Order must contain at least one product", nameof(products));
+        }
+
+        foreach (var product in products)
+        {
+            //if (product.StockQuantity <= 0)
+            {
+          //      throw new ArgumentException($"Product {product.Name} is out of stock", nameof(products));
+            }
+        }
+    }
+    private void ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            throw new ArgumentException("Email cannot be empty", nameof(email));
+        }
+
+        if (!email.Contains("@"))
+        {
+            throw new ArgumentException("Email must contain '@'", nameof(email));
+        }
+    }
+private void ValidateCity(string city)
+    {
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            throw new ArgumentException("City cannot be empty", nameof(city));
+        }
+
+        if (city.Length < 2)
+        {
+            throw new ArgumentException("City must be at least 2 characters long", nameof(city));
+        }
+    }
+private void ValidatePostalCode(string postalCode)
+    {
+        if (string.IsNullOrWhiteSpace(postalCode))
+        {
+            throw new ArgumentException("Postal code cannot be empty", nameof(postalCode));
+        }
+
+        if (postalCode.Length < 5)
+        {
+            throw new ArgumentException("Postal code must be at least 5 characters long", nameof(postalCode));
+        }
+    }
+private void ValidateCountry(string country)
+    {
+        if (string.IsNullOrWhiteSpace(country))
+        {
+            throw new ArgumentException("Country cannot be empty", nameof(country));
+        }
+
+        if (country.Length < 2)
+        {
+            throw new ArgumentException("Country must be at least 2 characters long", nameof(country));
+        }
+    }
+    private void ValidateStreet(string street)
+    {
+        if (string.IsNullOrWhiteSpace(street))
+        {
+            throw new ArgumentException("Street cannot be empty", nameof(street));
+        }
+
+        if (street.Length < 5)
+        {
+            throw new ArgumentException("Street must be at least 5 characters long", nameof(street));
+        }
+    }
+
+    private void ValidateFullName(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            throw new ArgumentException("Customer name cannot be empty", nameof(fullName));
+        }
+
+        if (fullName.Length < 3)
+        {
+            throw new ArgumentException("Customer name must be at least 3 characters long", nameof(fullName));
+        }
+    }
+}
