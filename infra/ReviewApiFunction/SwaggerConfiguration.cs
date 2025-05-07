@@ -10,8 +10,8 @@ namespace ReviewApiFunction
         public OpenApiInfo Info { get; set; } = new OpenApiInfo()
         {
             Version = "1.0.0",
-            Title = "Product Reviews API",
-            Description = "API for product reviews in the MerchStore application",
+            Title = "EchoCraft Product Reviews API",
+            Description = "API for product reviews in the EchoCraft application",
             Contact = new OpenApiContact()
             {
                 Name = "EchoCraft Team"
