@@ -51,7 +51,11 @@ public class AppDbContext : DbContext
                 .WithOne(oi => oi.Order)
                 .HasForeignKey(oi => oi.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
+            b.Property(o => o.OrderStatus)
+                .HasMaxLength(20)
+                .IsRequired();
         });
+        
 
         // -------- OrderItem --------
         mb.Entity<OrderProducts>(b =>
