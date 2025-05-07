@@ -5,23 +5,44 @@ namespace MerchStore.Domain.Entities;
 public class Order : Entity<Guid>
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
-    public string CustomerName { get; private set; } = string.Empty;
-    public string ShippingAddress { get; private set; } = string.Empty;
-    //public List<Product> Products { get; private set; } = new();
-   public string OrderStatus { get; private set; } = string.Empty;
+    public string FullName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public string Street { get; private set; } = string.Empty;
+    public string PostalCode { get; private set; } = string.Empty;
+    public string City { get; private set; } = string.Empty;
+    public string Country { get; private set; } = string.Empty; 
+    public string OrderStatus { get; private set; } = string.Empty;
    public ICollection<OrderProducts> Product { get; set; } = new List<OrderProducts>();
 
     private Order()
     {
     } // Privat parameterlös konstruktor för EF Core
-    public Order(string customerName, string shippingAddress, ICollection<OrderProducts> products) : base(Guid.NewGuid())
+    public Order(
+        string fullName,
+        string email,
+        string street,
+        string postalCode,
+        string city,
+        string country,
+        string orderStatus,
+        ICollection<OrderProducts> products
+    ) : base(Guid.NewGuid())
     {
-        ValidateCustomerName(customerName);
-        ValidateShippingAddress(shippingAddress);
+        ValidateFullName(fullName);
+        ValidateStreet(street);
         ValidateProducts(products);
+        ValidateEmail(email);
+        ValidateCity(city);
+        ValidatePostalCode(postalCode);
+        ValidateCountry(country);
 
-        CustomerName = customerName;
-        ShippingAddress = shippingAddress;
+        FullName = fullName;
+        Email = email;
+        Street = street;
+        PostalCode = postalCode;
+        City = city;
+        Country = country;
+        OrderStatus = orderStatus;  // du sätter detta även om du defaultar till "Pending" annars
         Product = products;
     }
 
@@ -40,30 +61,77 @@ public class Order : Entity<Guid>
             }
         }
     }
-
-    private void ValidateShippingAddress(string shippingAddress)
+    private void ValidateEmail(string email)
     {
-       if (string.IsNullOrWhiteSpace(shippingAddress))
+        if (string.IsNullOrWhiteSpace(email))
         {
-            throw new ArgumentException("Shipping address cannot be empty", nameof(shippingAddress));
+            throw new ArgumentException("Email cannot be empty", nameof(email));
         }
 
-        if (shippingAddress.Length < 10)
+        if (!email.Contains("@"))
         {
-            throw new ArgumentException("Shipping address must be at least 10 characters long", nameof(shippingAddress));
+            throw new ArgumentException("Email must contain '@'", nameof(email));
+        }
+    }
+private void ValidateCity(string city)
+    {
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            throw new ArgumentException("City cannot be empty", nameof(city));
+        }
+
+        if (city.Length < 2)
+        {
+            throw new ArgumentException("City must be at least 2 characters long", nameof(city));
+        }
+    }
+private void ValidatePostalCode(string postalCode)
+    {
+        if (string.IsNullOrWhiteSpace(postalCode))
+        {
+            throw new ArgumentException("Postal code cannot be empty", nameof(postalCode));
+        }
+
+        if (postalCode.Length < 5)
+        {
+            throw new ArgumentException("Postal code must be at least 5 characters long", nameof(postalCode));
+        }
+    }
+private void ValidateCountry(string country)
+    {
+        if (string.IsNullOrWhiteSpace(country))
+        {
+            throw new ArgumentException("Country cannot be empty", nameof(country));
+        }
+
+        if (country.Length < 2)
+        {
+            throw new ArgumentException("Country must be at least 2 characters long", nameof(country));
+        }
+    }
+    private void ValidateStreet(string street)
+    {
+        if (string.IsNullOrWhiteSpace(street))
+        {
+            throw new ArgumentException("Street cannot be empty", nameof(street));
+        }
+
+        if (street.Length < 5)
+        {
+            throw new ArgumentException("Street must be at least 5 characters long", nameof(street));
         }
     }
 
-    private void ValidateCustomerName(string customerName)
+    private void ValidateFullName(string fullName)
     {
-        if (string.IsNullOrWhiteSpace(customerName))
+        if (string.IsNullOrWhiteSpace(fullName))
         {
-            throw new ArgumentException("Customer name cannot be empty", nameof(customerName));
+            throw new ArgumentException("Customer name cannot be empty", nameof(fullName));
         }
 
-        if (customerName.Length < 3)
+        if (fullName.Length < 3)
         {
-            throw new ArgumentException("Customer name must be at least 3 characters long", nameof(customerName));
+            throw new ArgumentException("Customer name must be at least 3 characters long", nameof(fullName));
         }
     }
 }
