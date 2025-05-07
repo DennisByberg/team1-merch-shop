@@ -1,4 +1,6 @@
 ﻿using System.Text.Json;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 
 class Program
 {
@@ -6,47 +8,29 @@ class Program
     {
         try
         {
-            string functionAppName = "ReviewApiFunc20250507";
-            string functionKey = "API_KEY";
+            string keyVaultUrl = "https://merchstorekeyvault.vault.azure.net/";
+
+            // Create a SecretClient to interact with Azure Key Vault
+            var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
+
+            // Retrieve the value of the secrets
+            string functionAppName = (await secretClient.GetSecretAsync("ReviewApiFunctionAppName")).Value.Value;
+            string functionKey = (await secretClient.GetSecretAsync("ReviewApiFunctionKey")).Value.Value;
+
+            // Generate a random product ID (GUID) for testing
             string productId = Guid.NewGuid().ToString();
 
-            // Create HttpClient
-            using var client = new HttpClient();
+            // Create an HttpClient instance for making requests
+            using var httpClient = new HttpClient();
 
             Console.WriteLine("Review API Client Test");
             Console.WriteLine("=====================");
             Console.WriteLine($"Product ID: {productId}");
             Console.WriteLine();
 
-            // METHOD 1: API Key in Query String
-            string urlWithQueryParam = $"https://{functionAppName}.azurewebsites.net/api/products/{productId}/reviews?code={functionKey}";
-            Console.WriteLine("METHOD 1: API Key in Query String");
-            Console.WriteLine($"Requesting from: {urlWithQueryParam}");
-            Console.WriteLine();
-
-            // Make the first request with query string
-            var responseWithQueryParam = await client.GetStringAsync(urlWithQueryParam);
-
-            // Output the raw response
-            Console.WriteLine("Response from query param method:");
-            Console.WriteLine(responseWithQueryParam);
-            Console.WriteLine();
-
-            // Parse and display the response in a more readable format
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            var formattedJsonQueryParam = JsonSerializer.Serialize(
-                JsonSerializer.Deserialize<JsonElement>(responseWithQueryParam),
-                options);
-
-            Console.WriteLine("Formatted response (query param):");
-            Console.WriteLine(formattedJsonQueryParam);
-            Console.WriteLine();
-            Console.WriteLine("===========================================");
-            Console.WriteLine();
-
-            // METHOD 2: API Key in Header
+            // API Key in Header (recommended)
             string urlWithHeader = $"https://{functionAppName}.azurewebsites.net/api/products/{productId}/reviews";
-            Console.WriteLine("METHOD 2: API Key in Header");
+            Console.WriteLine("API Key in Header");
             Console.WriteLine($"Requesting from: {urlWithHeader}");
             Console.WriteLine($"With header: x-functions-key: {functionKey}");
             Console.WriteLine();
@@ -56,7 +40,7 @@ class Program
             request.Headers.Add("x-functions-key", functionKey);
 
             // Send the request and get the response
-            var headerResponse = await client.SendAsync(request);
+            var headerResponse = await httpClient.SendAsync(request);
             headerResponse.EnsureSuccessStatusCode();
 
             var responseWithHeader = await headerResponse.Content.ReadAsStringAsync();
@@ -67,13 +51,13 @@ class Program
             Console.WriteLine();
 
             // Parse and display the response in a more readable format
+            var options = new JsonSerializerOptions { WriteIndented = true };
             var formattedJsonHeader = JsonSerializer.Serialize(
                 JsonSerializer.Deserialize<JsonElement>(responseWithHeader),
                 options);
 
             Console.WriteLine("Formatted response (header):");
             Console.WriteLine(formattedJsonHeader);
-            Console.WriteLine();
             Console.WriteLine("===========================================");
             Console.WriteLine();
         }
