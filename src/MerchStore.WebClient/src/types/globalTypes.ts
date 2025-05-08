@@ -28,3 +28,14 @@ export type OrderItem = {
   price: number; // (decimal, not null)
   currency: string; // (nvarchar, not null)
 };
+
+export type Review = {
+  id: string;
+  productId: string;
+  customerName: string;
+  title: string;
+  content: string;
+  rating: number;
+  createdAt: string;
+  status: string;
+};

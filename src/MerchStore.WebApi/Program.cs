@@ -48,7 +48,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register application services (e.g. services, interfaces)
+// Register application services (e.g. services, repositories)
 builder.Services.AddApplication();
 
 // Register infrastructure services (e.g. DbContext, repositories)
