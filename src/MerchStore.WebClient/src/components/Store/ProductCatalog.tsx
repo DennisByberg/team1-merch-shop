@@ -49,8 +49,8 @@ export function ProductCatalog() {
                   {product.price} {product.currency}
                 </Typography>
                 <Chip
-                  label={product.inStock ? 'In Stock' : 'Out of Stock'}
-                  color={product.inStock ? 'success' : 'default'}
+                  label={product.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}
+                  color={product.stockQuantity > 0 ? 'success' : 'default'}
                   size={'small'}
                   sx={{ mt: 1 }}
                 />
@@ -71,7 +71,7 @@ export function ProductCatalog() {
                   startIcon={<ShoppingCartIcon />}
                   color={'success'}
                   size={'small'}
-                  disabled={!product.inStock}
+                  disabled={product.stockQuantity < 1}
                   sx={{ ml: 1 }}
                   onClick={() => addToCart(product)}
                 >
