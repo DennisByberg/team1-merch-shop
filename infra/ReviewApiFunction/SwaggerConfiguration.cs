@@ -9,7 +9,7 @@ namespace ReviewApiFunction
     {
         public OpenApiInfo Info { get; set; } = new OpenApiInfo()
         {
-            Version = "1.0.0",
+            Version = "1.0.1",
             Title = "EchoCraft Product Reviews API",
             Description = "API for product reviews in the EchoCraft application",
             Contact = new OpenApiContact()
