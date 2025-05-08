@@ -41,8 +41,12 @@ export function ProductDetailsCard(props: ProductDetailsCardProps) {
           {props.product.description}
         </Typography>
         <Chip
-          label={props.product.inStock ? 'In Stock' : 'Out of Stock'}
-          color={props.product.inStock ? 'success' : 'default'}
+          label={
+            props.product.stockQuantity > 0
+              ? `${props.product.stockQuantity} in stock`
+              : 'Out of stock'
+          }
+          color={props.product.stockQuantity > 0 ? 'success' : 'error'}
           size="small"
           sx={{ mb: 2 }}
         />
@@ -55,7 +59,7 @@ export function ProductDetailsCard(props: ProductDetailsCardProps) {
             variant={'contained'}
             color={'success'}
             startIcon={<ShoppingCartIcon />}
-            disabled={!props.product.inStock}
+            disabled={props.product.stockQuantity < 1}
             onClick={() => props.addToCart(props.product)}
           >
             Add To Cart

@@ -10,7 +10,7 @@ public class Product : Entity<Guid>
     public Money Price { get; private set; } = Money.FromSEK(0);
     public int StockQuantity { get; private set; } = 0;
     public Uri? ImageUrl { get; private set; } = null;
-
+    public ICollection<OrderProducts> OrderProducts { get; set; } = new List<OrderProducts>();
     private Product() { } // Privat parameterlös konstruktor för EF Core
 
     public Product(string name, string description, Uri? imageUrl, Money price, int stockQuantity) : base(Guid.NewGuid())
@@ -134,3 +134,4 @@ public class Product : Entity<Guid>
         }
     }
 }
+

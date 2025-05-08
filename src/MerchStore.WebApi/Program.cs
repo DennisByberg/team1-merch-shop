@@ -11,8 +11,13 @@ using Microsoft.EntityFrameworkCore;
 // Create and configure the WebApplication for MerchStore API
 var builder = WebApplication.CreateBuilder(args);
 
-var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
-builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+// Lägg endast till Azure Key Vault-konfiguration om applikationen körs i produktionsmiljö.
+// Detta gör att lokala och Docker-körningar använder appsettings.Development.json och miljövariabler istället.
+if (builder.Environment.IsProduction())
+{
+    var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
+    builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+}
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -43,7 +48,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register application services (e.g. services, interfaces)
+// Register application services (e.g. services, repositories)
 builder.Services.AddApplication();
 
 // Register infrastructure services (e.g. DbContext, repositories)
@@ -125,6 +130,10 @@ app.MapGet("/", context =>
     context.Response.Redirect("/swagger");
     return Task.CompletedTask;
 });
-
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();   // kör alla pending migrations
+}
 // Run the application
 app.Run();

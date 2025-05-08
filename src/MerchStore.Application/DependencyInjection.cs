@@ -16,6 +16,9 @@ public static class DependencyInjection
         // Register application services
         services.AddScoped<ICatalogService, CatalogService>();
 
+        // Register the review service
+        services.AddScoped<IReviewService, ReviewService>();
+
         return services;
     }
 }
