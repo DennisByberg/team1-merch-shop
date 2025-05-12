@@ -7,12 +7,11 @@ using Microsoft.OpenApi.Models;
 using Azure.Identity;
 using MerchStore.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
-// Create and configure the WebApplication for MerchStore API
 var builder = WebApplication.CreateBuilder(args);
 
 // Lägg endast till Azure Key Vault-konfiguration om applikationen körs i produktionsmiljö.
-// Detta gör att lokala och Docker-körningar använder appsettings.Development.json och miljövariabler istället.
 if (builder.Environment.IsProduction())
 {
     var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
@@ -24,6 +23,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Add support for controllers (API endpoints)
 builder.Services.AddControllers();
+
+// Add cookie authentication services
+builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie();
 
 // Add API key authentication
 builder.Services.AddAuthentication()
@@ -130,10 +134,12 @@ app.MapGet("/", context =>
     context.Response.Redirect("/swagger");
     return Task.CompletedTask;
 });
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();   // kör alla pending migrations
 }
+
 // Run the application
 app.Run();
