@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { Product } from '../types/globalTypes';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+// TODO: HIDE!
+const apiUrl =
+  'https://merchstorebackend.agreeabledesert-a7938720.swedencentral.azurecontainerapps.io/';
 const apiKey = 'API_KEY';
 
 export async function fetchProduct(id: string) {

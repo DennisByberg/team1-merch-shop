@@ -1,20 +1,13 @@
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+// TODO: HIDE!
+const apiUrl = 'https://reviewapifunc20250507.azurewebsites.net';
+const apiKey = 'API_KEY';
 
 export async function fetchProductReviews(productId: string) {
-  const res = await axios.get(`${apiUrl}/api/reviews/product/${productId}`);
-  return res.data;
-}
+  const res = await axios.get(`${apiUrl}/api/products/${productId}/reviews`, {
+    headers: { 'x-functions-key': apiKey },
+  });
 
-export async function fetchProductAverageRating(productId: string) {
-  const res = await axios.get(
-    `${apiUrl}/api/reviews/product/${productId}/average-rating`
-  );
-  return res.data;
-}
-
-export async function fetchProductReviewCount(productId: string) {
-  const res = await axios.get(`${apiUrl}/api/reviews/product/${productId}/count`);
   return res.data;
 }

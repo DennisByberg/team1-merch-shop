@@ -9,27 +9,30 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import { ProductProvider } from './context/ProductProvider';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import { ReviewProvider } from './context/ReviewProvider';
 
 export default function App() {
   return (
     <ThemeProvider theme={createTheme({ palette: { mode: 'dark' } })}>
       <CssBaseline />
       <CartProvider>
-        <ProductProvider>
-          <BrowserRouter>
-            <Container maxWidth={'lg'} sx={{ pb: 2 }}>
-              <Header />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/store" element={<StorePage />} />
-                <Route path="/store/:id" element={<ProductDetailsPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
-              </Routes>
-            </Container>
-          </BrowserRouter>
-        </ProductProvider>
+        <ReviewProvider>
+          <ProductProvider>
+            <BrowserRouter>
+              <Container maxWidth={'lg'} sx={{ pb: 2 }}>
+                <Header />
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/store" element={<StorePage />} />
+                  <Route path="/store/:id" element={<ProductDetailsPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+                </Routes>
+              </Container>
+            </BrowserRouter>
+          </ProductProvider>
+        </ReviewProvider>
       </CartProvider>
     </ThemeProvider>
   );
