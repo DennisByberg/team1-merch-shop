@@ -39,3 +39,15 @@ export type Review = {
   createdAt: string;
   status: string;
 };
+
+export type ReviewStats = {
+  productId: string;
+  averageRating: number;
+  reviewCount: number;
+};
+
+export type ReviewData = {
+  reviews: Review[];
+  stats?: ReviewStats;
+  loading: boolean;
+};
