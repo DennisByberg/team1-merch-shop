@@ -7,6 +7,10 @@ const LINKS_DATA = [
     name: 'Store',
     hash: 'store',
   },
+  {
+    name: 'Admin',
+    hash: 'admin',
+  },
 ] as const;
 
 export default LINKS_DATA;
