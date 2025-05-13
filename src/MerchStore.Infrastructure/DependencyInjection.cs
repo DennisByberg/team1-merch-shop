@@ -8,6 +8,7 @@ using MerchStore.Infrastructure.Persistence.Repositories;
 using MerchStore.Infrastructure.ExternalServices.Reviews.Configurations;
 using MerchStore.Infrastructure.ExternalServices.Reviews;
 
+
 namespace MerchStore.Infrastructure;
 
 // Syfte med denna klass: Centralisera all DI-registrering och byt till SQLite.
@@ -79,9 +80,11 @@ public static class DependencyInjection
             {
                 // Register the ASP.NET Core host.
                 options.UseAspNetCore();
-                
-             
+
+
             });
+           
+        
 
         return services;
     }

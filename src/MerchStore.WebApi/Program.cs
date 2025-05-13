@@ -5,6 +5,7 @@ using MerchStore.Infrastructure;
 using MerchStore.WebApi.Authentication.ApiKey;
 using Microsoft.OpenApi.Models;
 using Azure.Identity;
+using MerchStore.Infrastructure.ExternalServices;
 using MerchStore.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -40,7 +41,15 @@ builder.Services.AddAuthorization(options =>
         policy.AddAuthenticationSchemes(ApiKeyAuthenticationDefaults.AuthenticationScheme)
               .RequireAuthenticatedUser());
 });
-
+// configure https localhost
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5000); // HTTP
+    serverOptions.ListenAnyIP(5001, listenOptions =>
+    {
+        listenOptions.UseHttps(); // Uses the dev cert by default
+    });
+});
 // Configure CORS policy to allow any origin, header, and method
 builder.Services.AddCors(options =>
 {
@@ -105,7 +114,12 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
     }
 });
-
+builder.Services.AddOpenIddict()
+    .AddValidation(options =>
+    {
+        options.UseLocalServer();      // <-- This links the validation to your local server
+        options.UseAspNetCore();       // <-- Enables JWT validation in ASP.NET Core middleware
+    });
 // Build the application pipeline
 var app = builder.Build();
 
@@ -141,5 +155,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();   // kör alla pending migrations
 }
 
+ // Configure OpenIddict providers
+new LoginService(app.Services).StartAsync(default).Wait(); // Start the login service
 // Run the application
 app.Run();
