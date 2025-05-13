@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using MerchStore.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using MerchStore.WebApi.Models.Dtos;
+using MerchStore.WebApi.Models.Dtos.Products;
+using MerchStore.Application.Commands.Products;
 
 namespace MerchStore.WebApi.Controllers;
 
@@ -9,16 +10,11 @@ namespace MerchStore.WebApi.Controllers;
 [ApiController]
 [Route("api/products")]
 [Authorize(Policy = "ApiKeyPolicy")]
-public class ProductsController : ControllerBase
+public class ProductsController(ICatalogService catalogService, IProductManagementService productManagementService) : ControllerBase
 {
-    private readonly ICatalogService _catalogService;
+    private readonly ICatalogService _catalogService = catalogService;
+    private readonly IProductManagementService _productManagementService = productManagementService;
 
-    public ProductsController(ICatalogService catalogService)
-    {
-        _catalogService = catalogService;
-    }
-
-    // Hämta alla produkter.
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -40,7 +36,6 @@ public class ProductsController : ControllerBase
         }
     }
 
-    // Hämta en specifik produkt via ID.
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -71,15 +66,70 @@ public class ProductsController : ControllerBase
         }
     }
 
-    // Syfte: Mappa domänmodell till DTO.
-    private static ProductDto MapToDto(Domain.Entities.Product p) => new()
+    [HttpPost]
+    public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequestDto createProductRequestDto)
     {
-        Id = p.Id,
-        Name = p.Name,
-        Description = p.Description,
-        Price = p.Price.Amount,
-        Currency = p.Price.Currency,
-        ImageUrl = p.ImageUrl?.ToString(),
-        StockQuantity = p.StockQuantity
+        if (!ModelState.IsValid)
+        {
+            var problemDetails = new ValidationProblemDetails(ModelState)
+            {
+                Title = "One or more validation errors occurred.",
+                Status = StatusCodes.Status400BadRequest,
+            };
+            return BadRequest(problemDetails);
+        }
+
+        try
+        {
+            // Mappa från WebApi DTO till Application Command
+            var command = new CreateProductCommand
+            {
+                Name = createProductRequestDto.Name,
+                Description = createProductRequestDto.Description,
+                Price = createProductRequestDto.Price,
+                Currency = createProductRequestDto.Currency,
+                ImageUrl = createProductRequestDto.ImageUrl,
+                StockQuantity = createProductRequestDto.StockQuantity
+            };
+
+            // Anropa applikationstjänsten
+            var createdDomainProduct = await _productManagementService.CreateProductAsync(command);
+
+            // Mappa den skapade domänentiteten tillbaka till en ProductDto för svaret
+            var productResponseDto = MapToDto(createdDomainProduct);
+
+            // Returnera 201 Created med en länk till den nya resursen och den skapade DTO:n
+            return CreatedAtAction(nameof(GetById), new { id = productResponseDto.Id }, productResponseDto);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid input for product creation.",
+                Detail = ex.Message,
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "Internal Server Error",
+                Detail = "An error occurred while creating the product. " + ex.Message,
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    // Mappa domänmodell till DTO.
+    private static ProductDto MapToDto(Domain.Entities.Product product) => new()
+    {
+        Id = product.Id,
+        Name = product.Name,
+        Description = product.Description,
+        Price = product.Price.Amount,
+        Currency = product.Price.Currency,
+        ImageUrl = product.ImageUrl?.ToString(),
+        StockQuantity = product.StockQuantity
     };
 }

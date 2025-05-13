@@ -19,9 +19,6 @@ if (builder.Environment.IsProduction())
     builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 }
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // Add support for controllers (API endpoints)
 builder.Services.AddControllers();
 
