@@ -2,7 +2,13 @@ import { useState, useCallback } from 'react';
 import { ReviewContext } from './ReviewContext';
 import { fetchProductReviews } from '../api/reviewApi';
 import { ReactNode } from 'react';
-import { ReviewData } from '../types/globalTypes';
+import { Review, ReviewStats } from '../types/globalTypes';
+
+type ReviewData = {
+  reviews: Review[];
+  stats?: ReviewStats;
+  loading: boolean;
+};
 
 export function ReviewProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<Record<string, ReviewData>>({});

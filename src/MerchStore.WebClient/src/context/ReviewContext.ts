@@ -1,5 +1,11 @@
 import { createContext } from 'react';
-import { ReviewData } from '../types/globalTypes';
+import { Review, ReviewStats } from '../types/globalTypes';
+
+type ReviewData = {
+  reviews: Review[];
+  stats?: ReviewStats;
+  loading: boolean;
+};
 
 export type ReviewContextType = {
   getReviewData: (productId: string) => ReviewData | undefined;
