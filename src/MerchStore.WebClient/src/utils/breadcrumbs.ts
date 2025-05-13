@@ -39,6 +39,11 @@ export function getCrumbs(pathname: string, productName?: string): Crumb[] {
     case 'checkout':
       crumbs.push({ label: 'Checkout' });
       break;
+
+    // ADMIN
+    case 'admin':
+      crumbs.push({ label: 'Admin' });
+      break;
   }
 
   return crumbs;
