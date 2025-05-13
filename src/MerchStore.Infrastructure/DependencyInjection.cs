@@ -22,6 +22,8 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IRepositoryManager, RepositoryManager>();
+        // Register OpenIddict services
+        services.AddOpenIddictServices(configuration);
         services.AddLogging();
         services.AddScoped<AppDbContextSeeder>();
 
@@ -47,5 +49,40 @@ public static class DependencyInjection
         using var scope = serviceProvider.CreateScope();
         var seeder = scope.ServiceProvider.GetRequiredService<AppDbContextSeeder>();
         await seeder.SeedAsync();
+    }
+    public static IServiceCollection AddOpenIddictServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOpenIddict()
+            .AddCore(options =>
+            {
+                // Register the Entity Framework Core stores.
+                options.UseEntityFrameworkCore()
+                    .UseDbContext<AppDbContext>();
+            })
+            .AddServer(options =>
+            {
+                // Enable the token endpoint.
+                options.SetTokenEndpointUris("/connect/token");
+
+                // Enable the client credentials flow.
+                options.AllowClientCredentialsFlow();
+
+                // Register the signing and encryption credentials.
+                options.AddDevelopmentEncryptionCertificate()
+                    .AddDevelopmentSigningCertificate();
+
+                // Register the ASP.NET Core host and configure the endpoints.
+                options.UseAspNetCore()
+                    .EnableTokenEndpointPassthrough();
+            })
+            .AddValidation(options =>
+            {
+                // Register the ASP.NET Core host.
+                options.UseAspNetCore();
+                
+             
+            });
+
+        return services;
     }
 }
