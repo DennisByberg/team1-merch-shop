@@ -121,6 +121,39 @@ public class ProductsController(ICatalogService catalogService, IProductManageme
         }
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(Guid id)
+    {
+        try
+        {
+            // Call the application service to delete the product.
+            var success = await _productManagementService.DeleteProductAsync(id);
+
+            // If the product was not found, return 404 Not Found.
+            if (!success)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Product not found",
+                    Detail = $"Product with ID {id} not found",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            // Return 204 No Content if the deletion was successful, best praxis for DELETE requests.
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "Internal Server Error",
+                Detail = $"An error occurred while attempting to delete product with ID {id}. {ex.Message}",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
     // Mappa domänmodell till DTO.
     private static ProductDto MapToDto(Domain.Entities.Product product) => new()
     {

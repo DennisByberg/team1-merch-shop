@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Text.Json.Serialization;
 using MerchStore.Application;
 using MerchStore.Infrastructure;
 using MerchStore.WebApi.Authentication.ApiKey;
@@ -47,6 +46,22 @@ builder.Services.AddCors(options =>
 
 // Register application services (e.g. services, repositories)
 builder.Services.AddApplication();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Använder SQLite i Development-miljön
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlite(connectionString));
+}
+
+// Använder SQL Server i Production
+else
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlServer(connectionString));
+}
 
 // Register infrastructure services (e.g. DbContext, repositories)
 builder.Services.AddInfrastructure(builder.Configuration);

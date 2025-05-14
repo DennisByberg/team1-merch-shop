@@ -57,5 +57,32 @@ public class ProductManagementService(IProductRepository productRepository, IUni
         return product; // Return the created product
     }
 
-    // TODO: Implement other methods like UpdateProductAsync, DeleteProductAsync, etc.
+    public async Task<bool> DeleteProductAsync(Guid productId)
+    {
+        // Retrieve the product from the repository using the injected _productRepository
+        var product = await _productRepository.GetByIdAsync(productId);
+
+        if (product is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            // Delete the product from the repository
+            await _productRepository.RemoveAsync(product);
+
+            // Save changes to the database
+            await _unitOfWork.SaveChangesAsync();
+
+            // Return true if the product was deleted successfully
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    // TODO: Implement other methods like UpdateProductAsync etc.
 }

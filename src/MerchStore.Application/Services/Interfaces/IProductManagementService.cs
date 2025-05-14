@@ -11,4 +11,11 @@ public interface IProductManagementService
     /// <param name="command">The command containing product details.</param>
     /// <returns>The created product.</returns>
     Task<Product> CreateProductAsync(CreateProductCommand command);
+
+    /// <summary>
+    /// Deletes a product from the system.
+    /// </summary>
+    /// <param name="productId">The ID of the product to delete.</param>
+    /// <returns>True if the product was deleted successfully; otherwise, false.</returns>
+    Task<bool> DeleteProductAsync(Guid productId);
 }
