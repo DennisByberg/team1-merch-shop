@@ -1,18 +1,17 @@
 using System.Reflection;
-using System.Text.Json.Serialization;
 using MerchStore.Application;
 using MerchStore.Infrastructure;
 using MerchStore.WebApi.Authentication.ApiKey;
 using Microsoft.OpenApi.Models;
 using Azure.Identity;
+using MerchStore.Infrastructure.ExternalServices;
 using MerchStore.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
-// Create and configure the WebApplication for MerchStore API
 var builder = WebApplication.CreateBuilder(args);
 
 // Lägg endast till Azure Key Vault-konfiguration om applikationen körs i produktionsmiljö.
-// Detta gör att lokala och Docker-körningar använder appsettings.Development.json och miljövariabler istället.
 if (builder.Environment.IsProduction())
 {
     var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
@@ -20,10 +19,15 @@ if (builder.Environment.IsProduction())
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")+";Connection Timeout=60;"));
 
 // Add support for controllers (API endpoints)
 builder.Services.AddControllers();
+
+// Add cookie authentication services
+builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie();
 
 // Add API key authentication
 builder.Services.AddAuthentication()
@@ -36,7 +40,15 @@ builder.Services.AddAuthorization(options =>
         policy.AddAuthenticationSchemes(ApiKeyAuthenticationDefaults.AuthenticationScheme)
               .RequireAuthenticatedUser());
 });
-
+// configure https localhost
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5000); // HTTP
+    serverOptions.ListenAnyIP(5001, listenOptions =>
+    {
+        listenOptions.UseHttps(); // Uses the dev cert by default
+    });
+});
 // Configure CORS policy to allow any origin, header, and method
 builder.Services.AddCors(options =>
 {
@@ -50,6 +62,8 @@ builder.Services.AddCors(options =>
 
 // Register application services (e.g. services, repositories)
 builder.Services.AddApplication();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Register infrastructure services (e.g. DbContext, repositories)
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -101,6 +115,13 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
     }
 });
+builder.Services.AddOpenIddict()
+    .AddValidation(options =>
+    {
+        options.UseLocalServer();      // <-- This links the validation to your local server
+        options.UseAspNetCore();       // <-- Enables JWT validation in ASP.NET Core middleware
+        
+    });
 
 // Build the application pipeline
 var app = builder.Build();
@@ -130,10 +151,14 @@ app.MapGet("/", context =>
     context.Response.Redirect("/swagger");
     return Task.CompletedTask;
 });
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();   // kör alla pending migrations
 }
+
+ // Configure OpenIddict providers
+new LoginService(app.Services).StartAsync(default).Wait(); // Start the login service
 // Run the application
 app.Run();
