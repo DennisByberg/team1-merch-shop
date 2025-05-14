@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MerchStore.Infrastructure\MerchStore.Infrastructure.csproj" />
     <ProjectReference Include="..\MerchStore.Application\MerchStore.Application.csproj" />
+    <ProjectReference Include="..\MerchStore.Domain\MerchStore.Domain.csproj" />
   </ItemGroup>
 
 </Project>

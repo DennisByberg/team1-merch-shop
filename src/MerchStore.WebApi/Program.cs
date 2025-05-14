@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Text.Json.Serialization;
 using MerchStore.Application;
 using MerchStore.Infrastructure;
 using MerchStore.WebApi.Authentication.ApiKey;
@@ -63,6 +62,8 @@ builder.Services.AddCors(options =>
 
 // Register application services (e.g. services, repositories)
 builder.Services.AddApplication();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Register infrastructure services (e.g. DbContext, repositories)
 builder.Services.AddInfrastructure(builder.Configuration);
