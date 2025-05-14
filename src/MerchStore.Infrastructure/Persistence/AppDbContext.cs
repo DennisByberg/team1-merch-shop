@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; } = null!;
     public DbSet<OrderProducts> OrderItems { get; set; } = null!;
     
+    // sätter upp OpenIddict tabeller i databasen
     public DbSet<OpenIddictEntityFrameworkCoreApplication> Applications { get; set; } = null!;
     public DbSet<OpenIddictEntityFrameworkCoreAuthorization> Authorizations { get; set; } = null!;
     public DbSet<OpenIddictEntityFrameworkCoreScope> Scopes { get; set; } = null!;
@@ -79,7 +80,7 @@ public class AppDbContext : DbContext
             });
         });
 
-        // OpenIddict configuration
+        // OpenIddict konfiguration
         mb.UseOpenIddict();
     }
 }

@@ -119,7 +119,9 @@ builder.Services.AddOpenIddict()
     {
         options.UseLocalServer();      // <-- This links the validation to your local server
         options.UseAspNetCore();       // <-- Enables JWT validation in ASP.NET Core middleware
+        
     });
+
 // Build the application pipeline
 var app = builder.Build();
 
