@@ -19,7 +19,7 @@ if (builder.Environment.IsProduction())
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")+";Connection Timeout=60;"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") + ";Connection Timeout=60;"));
 
 // Add support for controllers (API endpoints)
 builder.Services.AddControllers();
@@ -40,15 +40,36 @@ builder.Services.AddAuthorization(options =>
         policy.AddAuthenticationSchemes(ApiKeyAuthenticationDefaults.AuthenticationScheme)
               .RequireAuthenticatedUser());
 });
+
 // configure https localhost
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(5000); // HTTP
-    serverOptions.ListenAnyIP(5001, listenOptions =>
+    if (builder.Environment.IsDevelopment())
     {
-        listenOptions.UseHttps(); // Uses the dev cert by default
-    });
+        serverOptions.ListenAnyIP(5000); // HTTP
+        serverOptions.ListenAnyIP(5001, listenOptions =>
+        {
+            listenOptions.UseHttps(); // Uses the dev cert by default for localhost
+        });
+    }
+    else
+    {
+        // In production (e.g., Azure Container Apps), listen on the port specified by the PORT environment variable.
+        // Azure Container Apps handles HTTPS termination externally.
+        var portEnvVar = Environment.GetEnvironmentVariable("PORT");
+        if (!string.IsNullOrEmpty(portEnvVar) && int.TryParse(portEnvVar, out int port))
+        {
+            serverOptions.ListenAnyIP(port);
+        }
+        else
+        {
+            // Fallback to a default port if PORT is not set or invalid.
+            // ASP.NET Core typically defaults to 8080 in containers if PORT isn't set.
+            serverOptions.ListenAnyIP(8080);
+        }
+    }
 });
+
 // Configure CORS policy to allow any origin, header, and method
 builder.Services.AddCors(options =>
 {
@@ -120,7 +141,7 @@ builder.Services.AddOpenIddict()
     {
         options.UseLocalServer();      // <-- This links the validation to your local server
         options.UseAspNetCore();       // <-- Enables JWT validation in ASP.NET Core middleware
-        
+
     });
 
 // Build the application pipeline
@@ -158,7 +179,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();   // kör alla pending migrations
 }
 
- // Configure OpenIddict providers
+// Configure OpenIddict providers
 new LoginService(app.Services).StartAsync(default).Wait(); // Start the login service
 // Run the application
 app.Run();
