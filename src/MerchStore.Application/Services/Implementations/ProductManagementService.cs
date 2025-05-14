@@ -84,5 +84,69 @@ public class ProductManagementService(IProductRepository productRepository, IUni
         }
     }
 
-    // TODO: Implement other methods like UpdateProductAsync etc.
+    public async Task<Product?> UpdateProductAsync(UpdateProductCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var productToUpdate = await _productRepository.GetByIdAsync(command.ProductId);
+
+        if (productToUpdate is null)
+        {
+            return null;
+        }
+
+        // Validate and create Money value object for price.
+        Money price;
+        try
+        {
+            price = new Money(command.Price, command.Currency);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new ArgumentException($"Invalid price or currency for update: {command.Price} {command.Currency}. Details: {ex.Message}", ex);
+        }
+
+        // Validate and create Uri for ImageUrl if present.
+        Uri? newImageUrl;
+        if (command.ImageUrl == null)
+        {
+            newImageUrl = productToUpdate.ImageUrl;
+        }
+
+        else if (string.IsNullOrWhiteSpace(command.ImageUrl))
+        {
+            newImageUrl = null;
+        }
+
+        else if (Uri.TryCreate(command.ImageUrl, UriKind.Absolute, out var parsedUri) &&
+                 (parsedUri.Scheme == Uri.UriSchemeHttp || parsedUri.Scheme == Uri.UriSchemeHttps))
+        {
+            newImageUrl = parsedUri;
+        }
+
+        else
+        {
+            throw new ArgumentException($"Invalid ImageUrl format or scheme for update: {command.ImageUrl}", nameof(command.ImageUrl));
+        }
+
+        productToUpdate.UpdateDetails(command.Name, command.Description, newImageUrl);
+        productToUpdate.UpdatePrice(price);
+        productToUpdate.UpdateStock(command.StockQuantity);
+
+        try
+        {
+            // Update the product in the repository.
+            await _productRepository.UpdateAsync(productToUpdate);
+
+            // Save changes to the database.
+            await _unitOfWork.SaveChangesAsync();
+
+            // Return the updated product.
+            return productToUpdate;
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }

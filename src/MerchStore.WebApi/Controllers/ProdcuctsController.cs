@@ -6,7 +6,6 @@ using MerchStore.Application.Commands.Products;
 
 namespace MerchStore.WebApi.Controllers;
 
-// Syfte: Exponera produkter via REST API med kontrollerad data (DTO).
 [ApiController]
 [Route("api/products")]
 [Authorize(Policy = "ApiKeyPolicy")]
@@ -154,7 +153,84 @@ public class ProductsController(ICatalogService catalogService, IProductManageme
         }
     }
 
-    // Mappa domänmodell till DTO.
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductRequestDto updateProductDto)
+    {
+        // If the DTO validation fails, return a 400 Bad Request with validation errors.
+        if (!ModelState.IsValid)
+        {
+            var problemDetails = new ValidationProblemDetails(ModelState)
+            {
+                Title = "One or more validation errors occurred.",
+                Status = StatusCodes.Status400BadRequest,
+            };
+
+            return BadRequest(problemDetails);
+        }
+
+        try
+        {
+            // Map the DTO to an UpdateProductCommand.
+            var command = new UpdateProductCommand
+            {
+                ProductId = id,
+                Name = updateProductDto.Name,
+                Description = updateProductDto.Description,
+                Price = updateProductDto.Price,
+                Currency = updateProductDto.Currency,
+                ImageUrl = updateProductDto.ImageUrl,
+                StockQuantity = updateProductDto.StockQuantity
+            };
+
+            // Call the application service to update the product.
+            var updatedDomainProduct = await _productManagementService.UpdateProductAsync(command);
+
+            if (updatedDomainProduct is null)
+            {
+                // If the service indicates the product was not found, return 404 Not Found.
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Product not found",
+                    Detail = $"Product with ID {id} not found.",
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            // Map the updated domain entity back to a ProductDto for the response.
+            var productResponseDto = MapToDto(updatedDomainProduct);
+
+            // Return 200 OK with the updated product DTO.
+            return Ok(productResponseDto);
+        }
+
+        // Catch specific exceptions related to invalid input.
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid input for product update.",
+                Detail = ex.Message,
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
+
+        // Catch any other exceptions that may occur during the update process.
+        catch
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "Internal Server Error",
+                Detail = $"An error occurred while updating product with ID {id}. Please try again later.", // Undvik att läcka ex.Message i produktion om den är för detaljerad.
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    // Helper method to map domain entity to DTO.
     private static ProductDto MapToDto(Domain.Entities.Product product) => new()
     {
         Id = product.Id,
