@@ -10,27 +10,29 @@ namespace MerchStore.WebApi.Controllers;
 public class AuthorizationController: Controller
 {
      private readonly IOpenIddictApplicationManager _applicationManager;
-
+         
     public AuthorizationController(IOpenIddictApplicationManager applicationManager)
         => _applicationManager = applicationManager;
-
+// Denna metod körs när en POST-förfrågan görs till /connect/token.
+// Den checkar av så att lösenord och clientid är korrekta mot vad som finns i databasen.
     [HttpPost("~/connect/token"), Produces("application/json")]
     public async Task<IActionResult> Exchange()
     {
+        using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+          ILogger logger = factory.CreateLogger("auth");
+        // kontrollerar att vi har en giltig begäran
         var request = HttpContext.GetOpenIddictServerRequest();
+        
         if (request.IsClientCredentialsGrantType())
         {
-            // Note: the client credentials are automatically validated by OpenIddict:
-            // if client_id or client_secret are invalid, this action won't be invoked.
-
+            // här letar vi tex upp har vi en användare med det clientid?
             var application = await _applicationManager.FindByClientIdAsync(request.ClientId) ??
                 throw new InvalidOperationException("The application cannot be found.");
 
-            // Create a new ClaimsIdentity containing the claims that
-            // will be used to create an id_token, a token or a code.
+           
             var identity = new ClaimsIdentity(TokenValidationParameters.DefaultAuthenticationType, OpenIddictConstants.Claims.Name, OpenIddictConstants.Claims.Role);
 
-            // Use the client_id as the subject identifier.
+            
             identity.SetClaim(OpenIddictConstants.Claims.Subject, await _applicationManager.GetClientIdAsync(application));
             identity.SetClaim(OpenIddictConstants.Claims.Name, await _applicationManager.GetDisplayNameAsync(application));
 
@@ -44,7 +46,7 @@ public class AuthorizationController: Controller
                 // Otherwise, only store the claim in the access tokens.
                 _ => [OpenIddictConstants.Destinations.AccessToken]
             });
-
+            logger.LogInformation("created signin");
             return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 

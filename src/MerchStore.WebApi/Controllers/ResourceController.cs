@@ -12,7 +12,7 @@ namespace MerchStore.WebApi.Controllers;
 public class ResourceController : Controller
 {
     private readonly IOpenIddictApplicationManager _applicationManager;
-
+        
     public ResourceController(IOpenIddictApplicationManager applicationManager)
         => _applicationManager = applicationManager; 
     // Skyddad GET-endpoint som endast kan nås av autentiserade klienter via OpenIddict
@@ -21,6 +21,8 @@ public class ResourceController : Controller
     public async Task<IActionResult> GetMessage()
     {
         // hämtar ClientID från autentiseringstoken
+        using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+        ILogger logger = factory.CreateLogger("hej");
         var subject = User.FindFirst(Claims.Subject)?.Value;
         if (string.IsNullOrEmpty(subject))
         {
@@ -35,6 +37,7 @@ public class ResourceController : Controller
             return BadRequest();
         }
 // om vi lyckas med alla steg så returneras en bekräftelsemeddelande
+logger.LogInformation("Authenticated");
         return Content($"{await _applicationManager.GetDisplayNameAsync(application)} has been successfully authenticated.");
     }
 }
