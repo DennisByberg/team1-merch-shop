@@ -8,6 +8,7 @@ using MerchStore.Infrastructure.ExternalServices;
 using MerchStore.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -146,6 +147,13 @@ builder.Services.AddOpenIddict()
 
 // Build the application pipeline
 var app = builder.Build();
+
+// Configure Forwarded Headers Middleware
+// This should be one of the first middleware components configured.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // Configure the HTTP request pipeline for the application
 if (app.Environment.IsDevelopment())
