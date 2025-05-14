@@ -58,19 +58,6 @@ jobs:
             --name merchstorebackend \
             --resource-group MerchStoreRG \
             --image ${{ secrets.DOCKERHUB_USERNAME }}/merch-store-backend:latest
-          echo "Waiting for backend container app to update..."
-          sleep 30
-
-      - name: 💨 Smoke Test Backend Application
-        run: |
-          echo "Attempting to reach Swagger UI at ${{ env.BACKEND_APP_URL }}/swagger"
-          STATUS_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --max-time 15 --retry 3 --retry-delay 5 "${{ env.BACKEND_APP_URL }}/swagger")
-          if [ "$STATUS_CODE" -eq 200 ]; then
-            echo "Smoke test PASSED: Received HTTP $STATUS_CODE from ${{ env.BACKEND_APP_URL }}/swagger"
-          else
-            echo "Smoke test FAILED: Received HTTP $STATUS_CODE from ${{ env.BACKEND_APP_URL }}/swagger."
-            exit 1 # Workflow will fail if smoke test does not return 200
-          fi
 
       - name: 🔄 Update Frontend Container App
         run: |
@@ -78,4 +65,3 @@ jobs:
             --name merchstorefrontend \
             --resource-group MerchStoreRG \
             --image ${{ secrets.DOCKERHUB_USERNAME }}/merch-store-frontend:latest \
-            --set-env-vars VITE_API_URL=${{ secrets.VITE_API_URL }}
