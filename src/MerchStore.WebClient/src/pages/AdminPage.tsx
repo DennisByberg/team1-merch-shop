@@ -31,7 +31,7 @@ export default function AdminPage() {
           variant={'contained'}
           color={'primary'}
           component={RouterLink}
-          to={''} // TODO: Add the correct route for managing products
+          to={'/admin/products'} // TODO: Add the correct route for managing products
           size={'large'}
           startIcon={<InventoryIcon />}
           sx={{ width: { xs: '80%', sm: 'auto' } }}

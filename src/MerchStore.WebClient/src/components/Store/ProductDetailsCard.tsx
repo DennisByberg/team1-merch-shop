@@ -35,7 +35,7 @@ export function ProductDetailsCard(props: ProductDetailsCardProps) {
         </Typography>
         <Divider sx={{ my: 2 }} />
         <Typography variant={'h5'} color={'primary'} fontWeight={'bold'} gutterBottom>
-          {props.product.price} {props.product.currency}
+          {Number(props.product.price).toFixed(2)} {props.product.currency}
         </Typography>
         <Typography variant={'body1'} sx={{ mb: 2 }}>
           {props.product.description}
