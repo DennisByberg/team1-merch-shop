@@ -11,11 +11,14 @@ import { ProductProvider } from './context/ProductProvider';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import { ReviewProvider } from './context/ReviewProvider';
 import AdminPage from './pages/AdminPage';
+import AdminPageProducts from './pages/AdminPageProducts';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   return (
     <ThemeProvider theme={createTheme({ palette: { mode: 'dark' } })}>
       <CssBaseline />
+      <Toaster position="top-center" reverseOrder={false} /> {/* Lägg till denna rad */}
       <CartProvider>
         <ReviewProvider>
           <ProductProvider>
@@ -30,6 +33,7 @@ export default function App() {
                   <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
                   <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/admin/products" element={<AdminPageProducts />} />
                 </Routes>
               </Container>
             </BrowserRouter>

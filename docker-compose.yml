@@ -8,6 +8,8 @@ services:
       - SA_PASSWORD=Your_password123
     ports:
       - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql # Persistent volume för SQL Server-data
 
   backend:
     image: mcr.microsoft.com/dotnet/sdk:9.0
@@ -23,3 +25,6 @@ services:
       - ApiKey__Value=API_KEY
     depends_on:
       - sqlserver
+
+volumes:
+  sqlserver_data: # Definiera volymen
