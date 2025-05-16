@@ -47,16 +47,27 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     if (builder.Environment.IsDevelopment())
     {
-        serverOptions.ListenAnyIP(5000); // HTTP
-        serverOptions.ListenAnyIP(5001, listenOptions =>
+        // Check if we're running in Docker (simple environment variable check)
+        bool isRunningInDocker = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"));
+
+        if (isRunningInDocker)
         {
-            listenOptions.UseHttps(); // Uses the dev cert by default for localhost
-        });
+            // In Docker, just use HTTP
+            serverOptions.ListenAnyIP(8080); // Match port in docker-compose.yml
+        }
+        else
+        {
+            // Local development outside Docker
+            serverOptions.ListenAnyIP(5000); // HTTP
+            serverOptions.ListenAnyIP(5001, listenOptions =>
+            {
+                listenOptions.UseHttps(); // Uses the dev cert by default for localhost
+            });
+        }
     }
     else
     {
-        // In production (e.g., Azure Container Apps), listen on the port specified by the PORT environment variable.
-        // Azure Container Apps handles HTTPS termination externally.
+        // Production code remains unchanged
         var portEnvVar = Environment.GetEnvironmentVariable("PORT");
         if (!string.IsNullOrEmpty(portEnvVar) && int.TryParse(portEnvVar, out int port))
         {
@@ -64,8 +75,6 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         }
         else
         {
-            // Fallback to a default port if PORT is not set or invalid.
-            // ASP.NET Core typically defaults to 8080 in containers if PORT isn't set.
             serverOptions.ListenAnyIP(8080);
         }
     }
@@ -163,7 +172,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 if (app.Environment.IsDevelopment())
 {
     // Seed the database with initial data in development mode
-    app.Services.SeedDatabaseAsync().Wait();
+    // app.Services.SeedDatabaseAsync().Wait();
 }
 
 app.UseSwagger();
@@ -188,7 +197,32 @@ app.MapGet("/", context =>
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();   // kör alla pending migrations
+
+    try
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            Console.WriteLine("Development environment detected: Recreating database...");
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+
+            // Seed the database after recreation
+            await app.Services.SeedDatabaseAsync();
+
+            Console.WriteLine("Database recreated successfully.");
+        }
+        else
+        {
+            Console.WriteLine("Production environment detected: Applying migrations...");
+            db.Database.Migrate();
+            Console.WriteLine("Migrations applied successfully.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error setting up database: {ex.Message}");
+        // Eventuellt logga felet mer detaljerat eller vidta åtgärder
+    }
 }
 
 // Configure OpenIddict providers

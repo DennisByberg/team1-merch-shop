@@ -44,17 +44,17 @@ export function ProductDetailsPage() {
             addToCart={addToCart}
           />
 
-          <ProductReviews reviews={reviews} stats={stats} loading={loading} />
-
           <Button
-            sx={{ mt: 2 }}
-            color="inherit"
-            variant="outlined"
+            sx={{ mt: 3 }}
+            color={'inherit'}
+            variant={'outlined'}
             startIcon={<ArrowBackIcon />}
             onClick={() => navigate(-1)}
           >
             Continue shopping
           </Button>
+
+          <ProductReviews reviews={reviews} stats={stats} loading={loading} />
         </>
       )}
     </Box>
