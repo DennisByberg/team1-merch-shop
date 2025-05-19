@@ -1,18 +1,18 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import { ThemeProvider, CssBaseline, Container, createTheme } from '@mui/material';
+import { Container, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { Toaster } from 'react-hot-toast';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
-import StorePage from './pages/StorePage';
-import { ProductDetailsPage } from './pages/ProductDetailsPage';
 import { CartProvider } from './context/CartProvider';
-import CartPage from './pages/CartPage';
-import CheckoutPage from './pages/CheckoutPage';
 import { ProductProvider } from './context/ProductProvider';
-import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import { ReviewProvider } from './context/ReviewProvider';
 import AdminPage from './pages/AdminPage';
 import AdminPageProducts from './pages/AdminPageProducts';
-import { Toaster } from 'react-hot-toast';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import HomePage from './pages/HomePage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import { ProductDetailsPage } from './pages/ProductDetailsPage';
+import StorePage from './pages/StorePage';
 
 export default function App() {
   return (
