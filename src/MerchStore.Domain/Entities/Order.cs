@@ -1,18 +1,20 @@
 using MerchStore.Domain.Common;
+using MerchStore.Domain.Enums;
 
 namespace MerchStore.Domain.Entities;
 
 public class Order : Entity<Guid>
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    // public Guid Id { get; private set; } = Guid.NewGuid();
+    // Tog bort Id eftersom den ärvs från Entity<Guid>
     public string FullName { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
     public string Street { get; private set; } = string.Empty;
     public string PostalCode { get; private set; } = string.Empty;
     public string City { get; private set; } = string.Empty;
-    public string Country { get; private set; } = string.Empty; 
-    public string OrderStatus { get; private set; } = string.Empty;
-   public ICollection<OrderProducts> Product { get; set; } = new List<OrderProducts>();
+    public string Country { get; private set; } = string.Empty;
+    public OrderStatus OrderStatus { get; private set; } = OrderStatus.Pending;
+    public ICollection<OrderProducts> OrderProducts { get; set; } = [];
 
     private Order()
     {
@@ -24,7 +26,7 @@ public class Order : Entity<Guid>
         string postalCode,
         string city,
         string country,
-        string orderStatus,
+        OrderStatus orderStatus,
         ICollection<OrderProducts> products
     ) : base(Guid.NewGuid())
     {
@@ -42,8 +44,8 @@ public class Order : Entity<Guid>
         PostalCode = postalCode;
         City = city;
         Country = country;
-        OrderStatus = orderStatus;  // du sätter detta även om du defaultar till "Pending" annars
-        Product = products;
+        OrderStatus = orderStatus;
+        OrderProducts = products;
     }
 
     private void ValidateProducts(ICollection<OrderProducts> products)
@@ -57,7 +59,7 @@ public class Order : Entity<Guid>
         {
             //if (product.StockQuantity <= 0)
             {
-          //      throw new ArgumentException($"Product {product.Name} is out of stock", nameof(products));
+                //      throw new ArgumentException($"Product {product.Name} is out of stock", nameof(products));
             }
         }
     }
@@ -73,7 +75,7 @@ public class Order : Entity<Guid>
             throw new ArgumentException("Email must contain '@'", nameof(email));
         }
     }
-private void ValidateCity(string city)
+    private void ValidateCity(string city)
     {
         if (string.IsNullOrWhiteSpace(city))
         {
@@ -85,7 +87,7 @@ private void ValidateCity(string city)
             throw new ArgumentException("City must be at least 2 characters long", nameof(city));
         }
     }
-private void ValidatePostalCode(string postalCode)
+    private void ValidatePostalCode(string postalCode)
     {
         if (string.IsNullOrWhiteSpace(postalCode))
         {
@@ -97,7 +99,7 @@ private void ValidatePostalCode(string postalCode)
             throw new ArgumentException("Postal code must be at least 5 characters long", nameof(postalCode));
         }
     }
-private void ValidateCountry(string country)
+    private void ValidateCountry(string country)
     {
         if (string.IsNullOrWhiteSpace(country))
         {
