@@ -61,6 +61,8 @@ jobs:
           build-args: |
             VITE_API_URL=${{ secrets.MERCHSTORE_BACKEND_URL }}
             VITE_API_KEY=${{ secrets.VITE_FRONTEND_API_KEY }}
+            VITE_REVIEW_API_URL=${{ secrets.VITE_REVIEW_API_URL }}
+            VITE_REVIEW_API_KEY=${{ secrets.VITE_REVIEW_API_KEY }}
 
   # Runs only if the 'build-and-push-images' job succeeds & it's a push to the main branch
   deploy-to-azure:
