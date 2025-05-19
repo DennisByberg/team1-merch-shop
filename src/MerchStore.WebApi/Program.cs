@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Text.Json.Serialization;
 using MerchStore.Application;
 using MerchStore.Infrastructure;
 using MerchStore.WebApi.Authentication.ApiKey;
@@ -9,6 +8,7 @@ using MerchStore.Infrastructure.ExternalServices;
 using MerchStore.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +20,7 @@ if (builder.Environment.IsProduction())
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")+";Connection Timeout=60;"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") + ";Connection Timeout=60;"));
 
 // Add support for controllers (API endpoints)
 builder.Services.AddControllers();
@@ -41,15 +41,45 @@ builder.Services.AddAuthorization(options =>
         policy.AddAuthenticationSchemes(ApiKeyAuthenticationDefaults.AuthenticationScheme)
               .RequireAuthenticatedUser());
 });
+
 // configure https localhost
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(5000); // HTTP
-    serverOptions.ListenAnyIP(5001, listenOptions =>
+    if (builder.Environment.IsDevelopment())
     {
-        listenOptions.UseHttps(); // Uses the dev cert by default
-    });
+        // Check if we're running in Docker (simple environment variable check)
+        bool isRunningInDocker = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"));
+
+        if (isRunningInDocker)
+        {
+            // In Docker, just use HTTP
+            serverOptions.ListenAnyIP(8080); // Match port in docker-compose.yml
+        }
+        else
+        {
+            // Local development outside Docker
+            serverOptions.ListenAnyIP(5000); // HTTP
+            serverOptions.ListenAnyIP(5001, listenOptions =>
+            {
+                listenOptions.UseHttps(); // Uses the dev cert by default for localhost
+            });
+        }
+    }
+    else
+    {
+        // Production code remains unchanged
+        var portEnvVar = Environment.GetEnvironmentVariable("PORT");
+        if (!string.IsNullOrEmpty(portEnvVar) && int.TryParse(portEnvVar, out int port))
+        {
+            serverOptions.ListenAnyIP(port);
+        }
+        else
+        {
+            serverOptions.ListenAnyIP(8080);
+        }
+    }
 });
+
 // Configure CORS policy to allow any origin, header, and method
 builder.Services.AddCors(options =>
 {
@@ -63,6 +93,8 @@ builder.Services.AddCors(options =>
 
 // Register application services (e.g. services, repositories)
 builder.Services.AddApplication();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Register infrastructure services (e.g. DbContext, repositories)
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -119,7 +151,6 @@ builder.Services.AddOpenIddict()
     {
         options.UseLocalServer();      // <-- This links the validation to your local server
         options.UseAspNetCore();       // <-- Enables JWT validation in ASP.NET Core middleware
-        
     }).AddServer(options =>
     {
         options.SetTokenEndpointUris("/connect/token")
@@ -133,16 +164,28 @@ builder.Services.AddOpenIddict()
         options.UseAspNetCore()
             .EnableTokenEndpointPassthrough()
             .EnableAuthorizationEndpointPassthrough();
-    });;
+});
+
 
 // Build the application pipeline
 var app = builder.Build();
+
+// Configure Forwarded Headers Middleware
+// This should be one of the first middleware components configured.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto
+});
 
 // Configure the HTTP request pipeline for the application
 if (app.Environment.IsDevelopment())
 {
     // Seed the database with initial data in development mode
-    app.Services.SeedDatabaseAsync().Wait();
+    // app.Services.SeedDatabaseAsync().Wait();
 }
 
 app.UseSwagger();
@@ -167,10 +210,35 @@ app.MapGet("/", context =>
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();   // kör alla pending migrations
+
+    try
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            Console.WriteLine("Development environment detected: Recreating database...");
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+
+            // Seed the database after recreation
+            await app.Services.SeedDatabaseAsync();
+
+            Console.WriteLine("Database recreated successfully.");
+        }
+        else
+        {
+            Console.WriteLine("Production environment detected: Applying migrations...");
+            db.Database.Migrate();
+            Console.WriteLine("Migrations applied successfully.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error setting up database: {ex.Message}");
+        // Eventuellt logga felet mer detaljerat eller vidta åtgärder
+    }
 }
 
- // Configure OpenIddict providers
+// Configure OpenIddict providers
 new LoginService(app.Services).StartAsync(default).Wait(); // Start the login service
 // Run the application
 app.Run();

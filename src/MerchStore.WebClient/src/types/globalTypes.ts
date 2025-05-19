@@ -1,41 +1,46 @@
 export type Product = {
-  id: string; // (PK, uniqueidentifier, not null)
-
-  name: string; // (nvarchar, not null)
-  description: string; // (nvarchar, not null)
-  price: number; // (decimal, not null)
-  currency: string; // (nvarchar, not null)
-  stockQuantity: number; // (int, not null)
-  imageUrl?: string; // (nvarchar, null)
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  stockQuantity: number;
+  imageUrl?: string;
 };
 
 export type Order = {
-  id: string; // (PK, uniqueidentifier, not null)
-  fullName: string; // (nvarchar, not null)
+  id: string;
+  fullName: string;
   email: string;
-  street: string; // (nvarchar, not null)
+  street: string;
   city: string;
   postalCode: string;
   country: string;
-  orderStatus: string; // (nvarchar, not null)
+  orderStatus: string;
 };
 
 export type OrderItem = {
-  id: string; // (PK, uniqueidentifier, not null)
-  orderId: string; // (uniqueidentifier, not null)
-  productId: string; // (uniqueidentifier, not null)
-  quantity: number; // (int, not null)
-  price: number; // (decimal, not null)
-  currency: string; // (nvarchar, not null)
+  id: string;
+  orderId: string;
+  productId: string;
+  quantity: number;
+  price: number;
+  currency: string;
 };
 
 export type Review = {
   id: string;
   productId: string;
-  customerName: string;
-  title: string;
   content: string;
-  rating: number;
   createdAt: string;
+  customerName: string;
+  rating: number;
   status: string;
+  title: string;
+};
+
+export type ReviewStats = {
+  productId: string;
+  averageRating: number;
+  reviewCount: number;
 };

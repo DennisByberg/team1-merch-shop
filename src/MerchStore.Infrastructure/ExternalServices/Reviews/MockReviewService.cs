@@ -10,7 +10,7 @@ namespace MerchStore.Infrastructure.ExternalServices.Reviews;
 public class MockReviewService
 {
     private static readonly Random _random = new Random();
-    private static readonly string[] _customerNames = { "John Doe", "Jane Smith", "Bob Johnson", "Alice Brown", "Charlie Davis" };
+    private static readonly string[] _customerNames = { "FB John Doe", "FB Jane Smith", "FB Bob Johnson", "FB Alice Brown", "FB Charlie Davis" };
     private static readonly string[] _reviewContents = {
         "I've been using this for weeks and it's fantastic.",
         "Exactly what I was looking for. High quality.",
@@ -36,7 +36,7 @@ public class MockReviewService
             ? Math.Round(reviews.Average(r => r.Rating), 1)
             : 0;
 
-        var stats = new ReviewStats(productId, averageRating, reviewCount);
+        var stats = new ReviewStats(productId, averageRating, reviews.Count());
 
         return (reviews, stats);
     }

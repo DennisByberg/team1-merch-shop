@@ -39,6 +39,18 @@ export function getCrumbs(pathname: string, productName?: string): Crumb[] {
     case 'checkout':
       crumbs.push({ label: 'Checkout' });
       break;
+
+    // ADMIN
+    case 'admin':
+      if (parts.length === 1) {
+        // On /admin, show only "Admin" without link
+        crumbs.push({ label: 'Admin' });
+      } else if (parts[1] === 'products') {
+        // On /admin/products, "Admin" is a link, "Products" is the last crumb
+        crumbs.push({ label: 'Admin', to: '/admin' });
+        crumbs.push({ label: 'Products' });
+      }
+      break;
   }
 
   return crumbs;

@@ -45,12 +45,17 @@ export function ProductCatalog() {
                 <Typography variant="body2" color="text.secondary" gutterBottom>
                   {product.description}
                 </Typography>
-                <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 1 }}>
-                  {product.price} {product.currency}
+                <Typography
+                  variant="subtitle1"
+                  color="primary"
+                  fontWeight="bold"
+                  sx={{ mt: 1 }}
+                >
+                  {Number(product.price).toFixed(2)} {product.currency}
                 </Typography>
                 <Chip
                   label={product.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}
-                  color={product.stockQuantity > 0 ? 'success' : 'default'}
+                  color={product.stockQuantity > 0 ? 'success' : 'error'}
                   size={'small'}
                   sx={{ mt: 1 }}
                 />

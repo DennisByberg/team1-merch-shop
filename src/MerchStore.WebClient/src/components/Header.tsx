@@ -27,16 +27,8 @@ export default function Header() {
   const { getTotalProductCount } = useCart();
   const navigate = useNavigate();
 
-  // Links data for the left section of the header
-  const leftLinks = LINKS_DATA.filter(
-    (link) => link.name === LINKS_DATA[0].name || LINKS_DATA[1].name
-  );
-
   const drawer = (
-    <Box
-      onClick={() => setMobileOpen((prevState) => !prevState)}
-      sx={{ textAlign: 'center' }}
-    >
+    <Box onClick={() => setMobileOpen((prevState) => !prevState)}>
       <Divider />
       <List>
         {LINKS_DATA.map((link) => (
@@ -58,15 +50,12 @@ export default function Header() {
         animate={{ y: 0, opacity: 1 }}
         sx={isTop ? HEADER_APP_BAR_STYLE_TOP : HEADER_APP_BAR_STYLE}
       >
-        <Container maxWidth="lg" disableGutters>
+        <Container maxWidth={'lg'} disableGutters>
           <Toolbar sx={{ pl: 0, pt: 1 }}>
             {/* Hamburger menu for mobile */}
             <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge={false}
               onClick={() => setMobileOpen((prevState) => !prevState)}
-              sx={{ mr: 2, display: { xs: 'flex', md: 'none' } }}
+              sx={{ display: { xs: 'flex', md: 'none' } }}
             >
               <MenuIcon />
             </IconButton>
@@ -78,9 +67,9 @@ export default function Header() {
                 to={'/'}
                 sx={{ display: { xs: 'none', md: 'block' }, mr: 2 }}
               >
-                <Box component={'img'} sx={{ width: 55 }} alt="Logo" src={logoPNG} />
+                <Box component={'img'} sx={{ width: 55 }} src={logoPNG} />
               </Box>
-              {leftLinks.map((link) => (
+              {LINKS_DATA.map((link) => (
                 <Box
                   component={Link}
                   to={link.hash}
@@ -93,26 +82,19 @@ export default function Header() {
             </Box>
 
             {/* Right section*/}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0,
-                ml: 'auto',
-              }}
-            >
+            <Box sx={HEADER_RIGHT_SECTION_STYLE}>
               <IconButton
                 onClick={() => navigate('/cart')}
                 title={'Cart'}
                 color={'inherit'}
                 component={Link}
-                to="/cart"
+                to={'/cart'}
               >
                 <Badge badgeContent={getTotalProductCount()} color="error">
                   <ShoppingCartIcon />
                 </Badge>
               </IconButton>
-              <IconButton title={'Login'} color="inherit">
+              <IconButton title={'Login'} color={'inherit'}>
                 <LoginIcon />
               </IconButton>
             </Box>
@@ -127,10 +109,7 @@ export default function Header() {
           ModalProps={{
             keepMounted: true,
           }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 },
-          }}
+          sx={HEADER_MOBILE_DRAWER_STYLE}
         >
           {drawer}
         </Drawer>
@@ -140,6 +119,18 @@ export default function Header() {
 }
 
 /*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
+const HEADER_MOBILE_DRAWER_STYLE: SxProps<Theme> = {
+  display: { xs: 'block', md: 'none' },
+  '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 },
+};
+
+const HEADER_RIGHT_SECTION_STYLE: SxProps<Theme> = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 0,
+  ml: 'auto',
+};
+
 const HEADER_APP_BAR_STYLE_TOP: SxProps<Theme> = {
   background: 'none',
   color: grey[50],
