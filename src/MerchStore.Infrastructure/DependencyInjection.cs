@@ -16,8 +16,10 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IRepositoryManager, RepositoryManager>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         // Register OpenIddict services
         services.AddOpenIddictServices(configuration);
         services.AddLogging();
@@ -36,6 +38,7 @@ public static class DependencyInjection
         services.AddHttpClient<ReviewApiClient>().SetHandlerLifetime(TimeSpan.FromMinutes(5));
         services.AddSingleton<MockReviewService>();
         services.AddScoped<IReviewRepository, ExternalReviewRepository>();
+
         return services;
     }
 
@@ -46,6 +49,8 @@ public static class DependencyInjection
         var seeder = scope.ServiceProvider.GetRequiredService<AppDbContextSeeder>();
         await seeder.SeedAsync();
     }
+
+    // This method is responsible for registering OpenIddict services.
     public static IServiceCollection AddOpenIddictServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOpenIddict()
@@ -78,8 +83,8 @@ public static class DependencyInjection
 
 
             });
-           
-        
+
+
 
         return services;
     }

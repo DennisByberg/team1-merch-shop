@@ -1,4 +1,5 @@
 using MerchStore.Domain.Entities;
+using MerchStore.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -12,8 +13,8 @@ public class AppDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
-    public DbSet<OrderProducts> OrderItems { get; set; } = null!;
-    
+    public DbSet<OrderProducts> OrderItems { get; set; } = null!; // Notera: DbSet heter OrderItems, klassen OrderProducts
+
     // sätter upp OpenIddict tabeller i databasen
     public DbSet<OpenIddictEntityFrameworkCoreApplication> Applications { get; set; } = null!;
     public DbSet<OpenIddictEntityFrameworkCoreAuthorization> Authorizations { get; set; } = null!;
@@ -31,11 +32,15 @@ public class AppDbContext : DbContext
         // Product configuration
         mb.Entity<Product>(b =>
         {
+            // Explicit definition av primärnyckel
+            b.HasKey(p => p.Id);
+
             b.OwnsOne(p => p.Price, mv =>
             {
                 mv.Property(m => m.Amount)
                     .HasColumnName("Price")
-                    .HasColumnType("decimal(18,2)");
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
 
                 mv.Property(m => m.Currency)
                     .HasColumnName("Currency")
@@ -53,12 +58,16 @@ public class AppDbContext : DbContext
         // Order configuration
         mb.Entity<Order>(b =>
         {
-            b.HasMany(o => o.Product)
+            // Explicit definition av primärnyckel
+            b.HasKey(o => o.Id);
+
+            b.HasMany(o => o.OrderProducts)
                 .WithOne(oi => oi.Order)
                 .HasForeignKey(oi => oi.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             b.Property(o => o.OrderStatus)
+                .HasConversion<string>()
                 .HasMaxLength(20)
                 .IsRequired();
         });
@@ -66,11 +75,15 @@ public class AppDbContext : DbContext
         // OrderProducts configuration
         mb.Entity<OrderProducts>(b =>
         {
+            // Explicit definition av primärnyckel
+            b.HasKey(op => op.Id);
+
             b.OwnsOne(p => p.UnitPrice, mv =>
             {
                 mv.Property(m => m.Amount)
                     .HasColumnName("Price")
-                    .HasColumnType("decimal(18,2)");
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
 
                 mv.Property(m => m.Currency)
                     .HasColumnName("Currency")
@@ -78,6 +91,8 @@ public class AppDbContext : DbContext
                     .HasMaxLength(3)
                     .IsRequired();
             });
+
+            b.Property(op => op.Quantity).IsRequired();
         });
 
         // OpenIddict konfiguration
