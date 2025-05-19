@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MerchStore.Application\MerchStore.Application.csproj" />
+    <ProjectReference Include="..\MerchStore.Domain\MerchStore.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

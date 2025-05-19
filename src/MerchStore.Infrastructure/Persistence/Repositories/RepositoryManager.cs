@@ -6,6 +6,7 @@ namespace MerchStore.Infrastructure.Persistence.Repositories;
 public class RepositoryManager : IRepositoryManager
 {
     private readonly IProductRepository _productRepository;
+    private readonly IOrderRepository _orderRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
@@ -14,13 +15,14 @@ public class RepositoryManager : IRepositoryManager
     /// <param name="productRepository">The product repository</param>
     /// <param name="orderRepository">The order repository</param>
     /// <param name="unitOfWork">The unit of work</param>
-    public RepositoryManager(IProductRepository productRepository, IUnitOfWork unitOfWork)
+    public RepositoryManager(IProductRepository productRepository, IOrderRepository orderRepository, IUnitOfWork unitOfWork)
     {
         _productRepository = productRepository;
+        _orderRepository = orderRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public IProductRepository ProductRepository => _productRepository;
-
-    public IUnitOfWork UnitOfWork => _unitOfWork;
+    public IProductRepository ProductRepository => _productRepository; // Expose the product repository
+    public IOrderRepository OrderRepository => _orderRepository; // Expose the order repository
+    public IUnitOfWork UnitOfWork => _unitOfWork; // Expose the unit of work
 }

@@ -6,17 +6,13 @@ namespace MerchStore.Application;
 
 public static class DependencyInjection
 {
-    /// <summary>
-    /// Adds Application layer services to the DI container
-    /// </summary>
-    /// <param name="services">The service collection to add services to</param>
-    /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         // Register application services
         services.AddScoped<ICatalogService, CatalogService>();
-        services.AddScoped<IProductManagementService, ProductManagementService>(); // <-- Lägg till denna rad
+        services.AddScoped<IProductManagementService, ProductManagementService>();
         services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<IOrderService, OrderService>();
 
         return services;
     }
