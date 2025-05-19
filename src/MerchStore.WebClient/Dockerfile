@@ -31,7 +31,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy the default Nginx configuration file
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY src/MerchStore.WebClient/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the built static files from the build stage
 COPY --from=build /app/dist /usr/share/nginx/html
