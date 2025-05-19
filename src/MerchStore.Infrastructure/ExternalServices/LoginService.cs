@@ -32,8 +32,18 @@ public class LoginService : IHostedService
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Token,
-                        OpenIddictConstants.Permissions.GrantTypes.ClientCredentials
-                    }
+                    OpenIddictConstants.Permissions.Endpoints.Authorization,
+                    OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
+                    OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                    OpenIddictConstants.Permissions.ResponseTypes.Code
+                    },
+                RedirectUris =
+                {
+                    new Uri("https://localhost:5001/swagger/oauth2-redirect.html"),
+                    // Add more URIs here if needed, e.g.:
+                    new Uri("https://oauth.pstmn.io/v1/callback"),
+                    new Uri ("https://merchstorefrontend.agreeabledesert-a7938720.swedencentral.azurecontainerapps.io/auth/callback")
+                }, DisplayName = "Admin"
                 });
             }
         }
