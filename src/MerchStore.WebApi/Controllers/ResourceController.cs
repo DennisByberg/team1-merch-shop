@@ -25,16 +25,36 @@ public class ResourceController : Controller
         ILogger logger = factory.CreateLogger("hej");
         var subject = User.FindFirst(Claims.Subject)?.Value;
         if (string.IsNullOrEmpty(subject))
-        {
+        { logger.LogWarning("No subject found");
             // om ingen ClientID hittas, returnera BadRequest
-            return BadRequest();
+            return BadRequest("No subject found");
         }
 // försöker hämta applikationen med ClientID
         var application = await _applicationManager.FindByClientIdAsync(subject);
         if (application == null)
         {
+            logger.LogWarning($"No application found with ClientId: '{subject}'");
+            
+            // Add diagnostic check - list all applications
+            var allApps =  _applicationManager.ListAsync(100, 0);
+            var appIds = new List<string>();
+            await foreach (var app in allApps)
+            {
+                var clientId = await _applicationManager.GetClientIdAsync(app);
+                appIds.Add(clientId);
+            }
+            
+            if (appIds.Count > 0)
+            {
+                logger.LogInformation($"Available ClientIds: {string.Join(", ", appIds)}");
+            }
+            else
+            {
+                logger.LogWarning("No applications registered!");
+            }
+            
             // Om ingen applikation hittas, returneras också ett BadRequest
-            return BadRequest();
+            return BadRequest("No application found");
         }
 // om vi lyckas med alla steg så returneras en bekräftelsemeddelande
 logger.LogInformation("Authenticated");
