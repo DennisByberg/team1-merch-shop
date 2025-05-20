@@ -3,18 +3,25 @@ using MerchStore.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using MerchStore.WebApi.Models.Dtos.Products;
 using MerchStore.Application.Commands.Products;
+using OpenIddict.Abstractions;
+using OpenIddict.Validation.AspNetCore;
 
 namespace MerchStore.WebApi.Controllers;
 
 [ApiController]
 [Route("api/products")]
-[Authorize(Policy = "ApiKeyPolicy")]
-public class ProductsController(ICatalogService catalogService, IProductManagementService productManagementService) : ControllerBase
+
+public class ProductsController(
+    ICatalogService catalogService,
+    IProductManagementService productManagementService,
+    IOpenIddictApplicationManager applicationManager) : Controller
 {
     private readonly ICatalogService _catalogService = catalogService;
     private readonly IProductManagementService _productManagementService = productManagementService;
+    private readonly IOpenIddictApplicationManager _applicationManager = applicationManager;
 
     [HttpGet]
+    [Authorize(Policy = "ApiKeyPolicy")] 
     public async Task<IActionResult> GetAll()
     {
         try
@@ -36,6 +43,7 @@ public class ProductsController(ICatalogService catalogService, IProductManageme
     }
 
     [HttpGet("{id}")]
+    [Authorize(Policy = "ApiKeyPolicy")] 
     public async Task<IActionResult> GetById(Guid id)
     {
         try
@@ -66,8 +74,20 @@ public class ProductsController(ICatalogService catalogService, IProductManageme
     }
 
     [HttpPost]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequestDto createProductRequestDto)
     {
+        var subject = User.FindFirst(OpenIddictConstants.Claims.Subject)?.Value;
+        var application = await _applicationManager.FindByClientIdAsync(subject);
+        if (application == null)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid Client ID",
+                Detail = $"Client ID '{User.FindFirst(OpenIddictConstants.Claims.Subject)?.Value}' not found.",
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
         if (!ModelState.IsValid)
         {
             var problemDetails = new ValidationProblemDetails(ModelState)

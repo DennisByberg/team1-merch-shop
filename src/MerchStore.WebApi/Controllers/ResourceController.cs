@@ -30,7 +30,7 @@ public class ResourceController : Controller
             return BadRequest("No subject found");
         }
 // försöker hämta applikationen med ClientID
-        var application = await _applicationManager.FindByClientIdAsync(subject);
+        var application = await _applicationManager.FindByClientIdAsync(User.FindFirst(Claims.Subject)?.Value);
         if (application == null)
         {
             logger.LogWarning($"No application found with ClientId: '{subject}'");
