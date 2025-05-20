@@ -164,7 +164,13 @@ builder.Services.AddOpenIddict()
         options.UseAspNetCore()
             .EnableTokenEndpointPassthrough()
             .EnableAuthorizationEndpointPassthrough();
-});
+
+        if (builder.Environment.IsDevelopment())
+        {
+            options.UseAspNetCore().DisableTransportSecurityRequirement();
+        }
+    });
+
 
 
 // Build the application pipeline
@@ -175,10 +181,6 @@ var app = builder.Build();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedProto
 });
 
 // Configure the HTTP request pipeline for the application
@@ -194,7 +196,16 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "MerchStore API V1");
 });
 
-app.UseHttpsRedirection();      // Redirect HTTP requests to HTTPS
+// Only use HTTPS Redirection if not running in Docker development mode where only HTTP is served
+// or if in production and you want to enforce HTTPS (assuming your production setup handles HTTPS termination)
+bool isRunningInDockerDevelopment = app.Environment.IsDevelopment() &&
+                                   !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"));
+
+if (!isRunningInDockerDevelopment) // Or more specific conditions based on your HTTPS setup
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseCors("AllowAllOrigins"); // Enable CORS policy
 app.UseAuthentication();        // Enable authentication middleware
 app.UseAuthorization();         // Enable authentication and authorization middleware
