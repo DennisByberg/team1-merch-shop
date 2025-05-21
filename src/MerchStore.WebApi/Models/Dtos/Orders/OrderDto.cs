@@ -12,5 +12,5 @@ public class OrderDto
     public string City { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
-    public List<OrderProductDto> OrderProducts { get; set; } = [];
+    public List<OrderProductDto> OrderProducts { get; set; }
 }
