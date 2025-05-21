@@ -31,7 +31,7 @@ export default function AdminPage() {
           variant={'contained'}
           color={'primary'}
           component={RouterLink}
-          to={'/admin/products'} // TODO: Add the correct route for managing products
+          to={'/admin/products'}
           size={'large'}
           startIcon={<InventoryIcon />}
           sx={{ width: { xs: '80%', sm: 'auto' } }}
@@ -44,7 +44,7 @@ export default function AdminPage() {
           variant={'contained'}
           color={'secondary'}
           component={RouterLink}
-          to={''} // TODO: Add the correct route for managing orders
+          to={'/admin/orders'}
           size={'large'}
           startIcon={<ReceiptLongIcon />}
           sx={{ width: { xs: '80%', sm: 'auto' } }}

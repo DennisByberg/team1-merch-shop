@@ -1,5 +1,5 @@
 import { Breadcrumbs, Link, Typography } from '@mui/material';
-import { grey } from '@mui/material/colors';
+import { grey, yellow } from '@mui/material/colors';
 import { useLocation, Link as RouterLink } from 'react-router-dom';
 import { getCrumbs } from '../utils/breadcrumbs';
 
@@ -10,27 +10,51 @@ type Props = {
 export default function PageBreadcrumbs(props: Props) {
   const location = useLocation();
   const crumbs = getCrumbs(location.pathname, props.productName);
+  const isAdminPath = location.pathname.startsWith('/admin');
 
   return (
-    <Breadcrumbs aria-label={'breadcrumb'} sx={BREADCRUMBS_SX}>
-      {crumbs.map((crumb) =>
-        crumb.to ? (
+    <Breadcrumbs
+      aria-label={'breadcrumb'}
+      sx={{
+        ...BREADCRUMBS_SX,
+      }}
+    >
+      {crumbs.map((crumb) => {
+        let currentCrumbColor = 'inherit';
+        let currentLastCrumbColor = 'white';
+
+        if (isAdminPath) {
+          if (crumb.label.toLowerCase() === 'home') {
+            currentCrumbColor = 'inherit';
+          } else {
+            currentCrumbColor = yellow[400];
+            currentLastCrumbColor = yellow[400];
+          }
+        }
+
+        return crumb.to ? (
           <Link
             key={crumb.label}
             component={RouterLink}
             underline={'hover'}
-            color={'inherit'}
             to={crumb.to}
-            sx={LINK_SX}
+            sx={{
+              ...LINK_SX,
+              color: currentCrumbColor,
+            }}
           >
             {crumb.label}
           </Link>
         ) : (
-          <Typography key={crumb.label} color={'white'} fontWeight={500}>
+          <Typography
+            key={crumb.label}
+            fontWeight={500}
+            sx={{ color: currentLastCrumbColor }}
+          >
             {crumb.label}
           </Typography>
-        )
-      )}
+        );
+      })}
     </Breadcrumbs>
   );
 }

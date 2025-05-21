@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  SxProps,
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -160,16 +161,26 @@ export default function AdminPageProducts() {
         <CustomSpinner text="Loading products..." />
       ) : (
         <>
-          {/* Button to open the create product dialog */}
-          <Button
-            sx={{ marginBottom: 2 }}
-            variant={'contained'}
-            color={'primary'}
-            startIcon={<AddCircleOutlineIcon />}
-            onClick={handleClickOpenCreateDialog}
-          >
-            Add New Product
-          </Button>
+          {/* Container for Back and Add New Product buttons */}
+          <Box sx={BUTTON_ROW_STYLE}>
+            <Button
+              color={'inherit'}
+              variant={'outlined'}
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate('/admin')}
+            >
+              Back to admin dashboard
+            </Button>
+
+            <Button
+              variant={'contained'}
+              color={'primary'}
+              startIcon={<AddCircleOutlineIcon />}
+              onClick={handleClickOpenCreateDialog}
+            >
+              New Product
+            </Button>
+          </Box>
 
           {/* Create Product Dialog */}
           <ProductCreateDialog
@@ -221,18 +232,17 @@ export default function AdminPageProducts() {
               </Button>
             </DialogActions>
           </Dialog>
-
-          <Button
-            sx={{ mt: 3 }}
-            color={'inherit'}
-            variant={'outlined'}
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/admin')}
-          >
-            Back to admin dashboard
-          </Button>
         </>
       )}
     </Box>
   );
 }
+
+/*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
+const BUTTON_ROW_STYLE: SxProps = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  mb: 3,
+  mt: 3,
+};
