@@ -1,9 +1,16 @@
 import axios from 'axios';
 import { Product } from '../types/globalTypes';
 
-// TODO: HIDE!
-const apiUrl = import.meta.env.VITE_API_URL;
-const apiKey = import.meta.env.VITE_API_KEY;
+const apiUrl: string = import.meta.env.VITE_API_URL;
+const apiKey: string = import.meta.env.VITE_API_KEY;
+
+export async function fetchProducts() {
+  const res = await axios.get<Product[]>(`${apiUrl}/api/products`, {
+    headers: { 'X-API-Key': apiKey },
+  });
+
+  return res.data;
+}
 
 export async function fetchProduct(id: string) {
   const res = await axios.get<Product>(`${apiUrl}/api/products/${id}`, {
