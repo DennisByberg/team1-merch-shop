@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { ReviewContext } from './ReviewContext';
 import { fetchProductReviews } from '../api/reviewApi';
 import { ReactNode } from 'react';
-import { Review, ReviewStats } from '../types/globalTypes';
+import { Review, ReviewStats } from '../interfaces';
 
 type ReviewData = {
   reviews: Review[];

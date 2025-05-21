@@ -1,6 +1,6 @@
 // Base URL for your backend's authentication server
 const AUTH_SERVER_BASE_URL = import.meta.env.VITE_API_URL;
-const REDIRECT_URI = `${AUTH_SERVER_BASE_URL}/auth/callback`;
+const REDIRECT_URI = `${window.location.origin}/auth/callback`;
 
 // Get client ID and secret from environment variables
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;

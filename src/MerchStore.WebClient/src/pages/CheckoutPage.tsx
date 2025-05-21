@@ -18,7 +18,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { grey } from '@mui/material/colors';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid'; // Lägg till denna import överst (kräver 'uuid' installerat)
-import { Order, OrderItem } from '../types/globalTypes';
+import { IOrder, OrderItem } from '../interfaces';
 
 export default function CheckoutPage() {
   const { items, removeItem } = useCart();
@@ -49,7 +49,7 @@ export default function CheckoutPage() {
     event.preventDefault();
     try {
       // Skapa en fake order
-      const fakeOrder: Order = {
+      const fakeOrder: IOrder = {
         id: uuidv4(),
         fullName: form.fullName,
         email: form.email,

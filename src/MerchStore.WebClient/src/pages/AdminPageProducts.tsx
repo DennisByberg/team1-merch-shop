@@ -17,10 +17,18 @@ import CustomSpinner from '../components/CustomSpinner';
 import PageBreadcrumbs from '../components/PageBreadcrumbs';
 import { useProducts } from '../hooks/useProducts';
 import { validateProductForm } from '../utils/validateProductForm';
-import { INewProductForm } from '../types/globalInterfaces';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+interface INewProductForm {
+  name: string;
+  description: string;
+  price: string;
+  stockQuantity: string;
+  imageUrl: string;
+  currency: string;
+}
 
 export default function AdminPageProducts() {
   const initialProductFormState: INewProductForm = {
@@ -80,6 +88,7 @@ export default function AdminPageProducts() {
         ...newProduct,
         price: parseFloat(newProduct.price),
         stockQuantity: parseInt(newProduct.stockQuantity, 10),
+        inStock: newProduct.stockQuantity !== '0',
       };
       if (editProductId) {
         // Update
@@ -105,6 +114,7 @@ export default function AdminPageProducts() {
       name: product.name,
       description: product.description,
       price: product.price.toString(),
+      inStock: product.stockQuantity > 0,
       stockQuantity: product.stockQuantity.toString(),
       imageUrl: product.imageUrl ?? '',
       currency: product.currency,

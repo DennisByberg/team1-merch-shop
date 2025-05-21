@@ -1,12 +1,12 @@
 import { createContext } from 'react';
-import { Product } from '../types/globalTypes';
+import { IProduct } from '../interfaces';
 
 export type ProductContextType = {
-  products: Product[];
+  products: IProduct[];
   loading: boolean;
-  addProduct?: (product: Omit<Product, 'id'>) => Promise<Product>;
+  addProduct?: (product: Omit<IProduct, 'id'>) => Promise<IProduct>;
   deleteProduct?: (id: string) => Promise<void>;
-  updateProduct?: (id: string, product: Omit<Product, 'id'>) => Promise<Product>;
+  updateProduct?: (id: string, product: Omit<IProduct, 'id'>) => Promise<IProduct>;
 };
 
 export const ProductContext = createContext<ProductContextType | undefined>(undefined);

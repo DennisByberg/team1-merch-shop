@@ -13,11 +13,11 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Product } from '../../types/globalTypes';
+import { IProduct } from '../../interfaces';
 import { blue } from '@mui/material/colors';
 
 type Props = {
-  products: Product[];
+  products: IProduct[];
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 };

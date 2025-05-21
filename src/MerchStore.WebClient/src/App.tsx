@@ -18,6 +18,7 @@ import { AuthProvider } from './context/AuthProvider';
 import AdminLoginPage from './pages/AdminLoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminPageOrders from './pages/AdminPageOrders';
+import AdminPageOrderDetail from './pages/AdminPageOrderDetail';
 
 export default function App() {
   return (
@@ -54,6 +55,10 @@ export default function App() {
                       <Route path={'/admin'} element={<AdminPage />} />
                       <Route path={'/admin/products'} element={<AdminPageProducts />} />
                       <Route path={'/admin/orders'} element={<AdminPageOrders />} />
+                      <Route
+                        path={'/admin/orders/:orderId'}
+                        element={<AdminPageOrderDetail />}
+                      />
                     </Route>
                   </Routes>
                 </Container>

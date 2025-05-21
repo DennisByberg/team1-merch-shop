@@ -8,11 +8,11 @@ import {
   CircularProgress,
   Typography,
 } from '@mui/material';
-import { Product } from '../../types/globalTypes';
+import { IProduct } from '../../interfaces';
 import { fetchProducts } from '../../api/productApi';
 
 export default function ProductSlider() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const LOADING_TEXT = 'Fetching products from the back of the store...';
 
