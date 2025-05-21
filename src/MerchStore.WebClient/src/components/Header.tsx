@@ -159,7 +159,7 @@ export default function Header() {
                     onClick={handleAdminMenuClick}
                     color={'inherit'}
                     title={'Admin-meny'}
-                    sx={{ color: yellow[500] }}
+                    sx={{ color: yellow[400] }}
                   >
                     <AdminPanelSettingsIcon />
                   </IconButton>
@@ -175,7 +175,7 @@ export default function Header() {
                       }}
                     >
                       <LogoutIcon sx={{ mr: 1 }} />
-                      Logga ut
+                      Log out
                     </MenuItem>
                   </Menu>
                 </>

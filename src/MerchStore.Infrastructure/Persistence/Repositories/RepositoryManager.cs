@@ -1,4 +1,5 @@
 using MerchStore.Application.Common.Interfaces;
+using MerchStore.Domain.Entities;
 using MerchStore.Domain.Interfaces;
 
 namespace MerchStore.Infrastructure.Persistence.Repositories;
@@ -25,4 +26,18 @@ public class RepositoryManager : IRepositoryManager
     public IProductRepository ProductRepository => _productRepository; // Expose the product repository
     public IOrderRepository OrderRepository => _orderRepository; // Expose the order repository
     public IUnitOfWork UnitOfWork => _unitOfWork; // Expose the unit of work
+    public Task SaveAsync()
+    {
+        return _unitOfWork.SaveAsync(); // Call the save method on the unit of work
+    }
+
+    public Task<Order?> GetByIdAsync(Guid orderId)
+    {
+        return _orderRepository.GetByIdAsync(orderId); // Call the get by ID method on the order repository
+    }
+
+    public Task UpdateAsync(Order order)
+    {
+        return _orderRepository.UpdateAsync(order); // Call the update method on the order repository
+    }
 }

@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { Review, ReviewStats } from '../types/globalTypes';
+import { Review, ReviewStats } from '../interfaces';
 
 type ReviewData = {
   reviews: Review[];

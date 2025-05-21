@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  SxProps,
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -16,10 +17,18 @@ import CustomSpinner from '../components/CustomSpinner';
 import PageBreadcrumbs from '../components/PageBreadcrumbs';
 import { useProducts } from '../hooks/useProducts';
 import { validateProductForm } from '../utils/validateProductForm';
-import { INewProductForm } from '../types/globalInterfaces';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+interface INewProductForm {
+  name: string;
+  description: string;
+  price: string;
+  stockQuantity: string;
+  imageUrl: string;
+  currency: string;
+}
 
 export default function AdminPageProducts() {
   const initialProductFormState: INewProductForm = {
@@ -79,6 +88,7 @@ export default function AdminPageProducts() {
         ...newProduct,
         price: parseFloat(newProduct.price),
         stockQuantity: parseInt(newProduct.stockQuantity, 10),
+        inStock: newProduct.stockQuantity !== '0',
       };
       if (editProductId) {
         // Update
@@ -104,6 +114,7 @@ export default function AdminPageProducts() {
       name: product.name,
       description: product.description,
       price: product.price.toString(),
+      inStock: product.stockQuantity > 0,
       stockQuantity: product.stockQuantity.toString(),
       imageUrl: product.imageUrl ?? '',
       currency: product.currency,
@@ -160,16 +171,26 @@ export default function AdminPageProducts() {
         <CustomSpinner text="Loading products..." />
       ) : (
         <>
-          {/* Button to open the create product dialog */}
-          <Button
-            sx={{ marginBottom: 2 }}
-            variant={'contained'}
-            color={'primary'}
-            startIcon={<AddCircleOutlineIcon />}
-            onClick={handleClickOpenCreateDialog}
-          >
-            Add New Product
-          </Button>
+          {/* Container for Back and Add New Product buttons */}
+          <Box sx={BUTTON_ROW_STYLE}>
+            <Button
+              color={'inherit'}
+              variant={'outlined'}
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate('/admin')}
+            >
+              Back to admin dashboard
+            </Button>
+
+            <Button
+              variant={'contained'}
+              color={'primary'}
+              startIcon={<AddCircleOutlineIcon />}
+              onClick={handleClickOpenCreateDialog}
+            >
+              New Product
+            </Button>
+          </Box>
 
           {/* Create Product Dialog */}
           <ProductCreateDialog
@@ -221,18 +242,17 @@ export default function AdminPageProducts() {
               </Button>
             </DialogActions>
           </Dialog>
-
-          <Button
-            sx={{ mt: 3 }}
-            color={'inherit'}
-            variant={'outlined'}
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/admin')}
-          >
-            Back to admin dashboard
-          </Button>
         </>
       )}
     </Box>
   );
 }
+
+/*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
+const BUTTON_ROW_STYLE: SxProps = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  mb: 3,
+  mt: 3,
+};

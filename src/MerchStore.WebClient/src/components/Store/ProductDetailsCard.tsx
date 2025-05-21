@@ -10,12 +10,12 @@ import {
   Theme,
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Product } from '../../types/globalTypes';
+import { IProduct } from '../../interfaces';
 
 type ProductDetailsCardProps = {
-  product: Product;
+  product: IProduct;
   quantityInCart: number;
-  addToCart: (product: Product) => void;
+  addToCart: (product: IProduct) => void;
 };
 
 export function ProductDetailsCard(props: ProductDetailsCardProps) {
@@ -41,12 +41,8 @@ export function ProductDetailsCard(props: ProductDetailsCardProps) {
           {props.product.description}
         </Typography>
         <Chip
-          label={
-            props.product.stockQuantity > 0
-              ? `${props.product.stockQuantity} in stock`
-              : 'Out of stock'
-          }
-          color={props.product.stockQuantity > 0 ? 'success' : 'error'}
+          label={props.product.inStock ? 'in stock' : 'Out of stock'}
+          color={props.product.inStock ? 'success' : 'error'}
           size="small"
           sx={{ mb: 2 }}
         />
@@ -59,7 +55,7 @@ export function ProductDetailsCard(props: ProductDetailsCardProps) {
             variant={'contained'}
             color={'success'}
             startIcon={<ShoppingCartIcon />}
-            disabled={props.product.stockQuantity < 1}
+            disabled={!props.product.inStock}
             onClick={() => props.addToCart(props.product)}
           >
             Add To Cart

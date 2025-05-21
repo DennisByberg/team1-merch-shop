@@ -13,11 +13,11 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Product } from '../../types/globalTypes';
-import { purple } from '@mui/material/colors';
+import { IProduct } from '../../interfaces';
+import { blue } from '@mui/material/colors';
 
 type Props = {
-  products: Product[];
+  products: IProduct[];
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 };
@@ -28,25 +28,34 @@ export default function ProductAdminTable(props: Props) {
       <Table sx={{ minWidth: 650 }} aria-label="product table">
         <TableHead sx={{ backgroundColor: 'action.hover' }}>
           <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell align={'right'}>Price</TableCell>
-            <TableCell align={'right'}>Stock</TableCell>
-            <TableCell align={'center'}>Image</TableCell>
-            <TableCell align={'center'}>Actions</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }} align={'right'}>
+              Price
+            </TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }} align={'right'}>
+              Stock
+            </TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }} align={'center'}>
+              Image
+            </TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }} align={'center'}>
+              Actions
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {props.products.map((product) => (
             <TableRow
+              hover
               key={product.id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <TableCell sx={{ fontFamily: 'monospace', color: purple[100] }}>
+              <TableCell sx={{ fontFamily: 'monospace', color: blue[200] }}>
                 {product.id}
               </TableCell>
-              <TableCell component="th" scope="row">
+              <TableCell component={'th'} scope={'row'}>
                 {product.name}
               </TableCell>
               <TableCell>{product.description}</TableCell>

@@ -2,11 +2,11 @@ import { Box, Button, SxProps, Theme } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
-import { Product } from '../../types/globalTypes';
+import { IProduct } from '../../interfaces';
 import { useNavigate } from 'react-router-dom';
 
 type CartActionsProps = {
-  items: Product[];
+  items: IProduct[];
   removeItem: (id: string) => void;
 };
 

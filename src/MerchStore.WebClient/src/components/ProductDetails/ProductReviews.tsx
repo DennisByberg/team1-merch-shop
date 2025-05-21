@@ -1,6 +1,6 @@
 import { Box, Typography, Divider, Rating, SxProps, Theme } from '@mui/material';
 import CustomSpinner from '../CustomSpinner';
-import { Review, ReviewStats } from '../../types/globalTypes';
+import { Review, ReviewStats } from '../../interfaces';
 import { grey } from '@mui/material/colors';
 
 type Props = {

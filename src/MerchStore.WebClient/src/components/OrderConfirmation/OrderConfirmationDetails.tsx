@@ -10,10 +10,10 @@ import {
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
-import { Order } from '../../types/globalTypes';
+import { IOrder } from '../../interfaces';
 
 type Props = {
-  order: Order;
+  order: IOrder;
 };
 
 export default function OrderConfirmationDetails(props: Props) {

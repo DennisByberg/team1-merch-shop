@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { Product } from '../types/globalTypes';
+import { IProduct } from '../interfaces';
 import { fetchProduct } from '../api/productApi';
 import { useCart } from '../hooks/useCart';
 import { ProductDetailsCard } from '../components/Store/ProductDetailsCard';
@@ -13,7 +13,7 @@ import CustomSpinner from '../components/CustomSpinner';
 import { ProductReviews } from '../components/ProductDetails/ProductReviews';
 
 export function ProductDetailsPage() {
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<IProduct | null>(null);
   const { id } = useParams();
   const { addToCart, items } = useCart();
   const navigate = useNavigate();

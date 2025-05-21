@@ -1,8 +1,8 @@
 import { useState, useEffect, ReactNode } from 'react';
-import { Product } from '../types/globalTypes';
+import { IProduct } from '../interfaces';
 import { CartContext } from './CartContext';
 
-export type CartItem = Product & { quantity: number };
+export type CartItem = IProduct & { quantity: number };
 
 const CART_KEY = 'cart';
 
@@ -16,7 +16,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(CART_KEY, JSON.stringify(items));
   }, [items]);
 
-  function addToCart(product: Product) {
+  function addToCart(product: IProduct) {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
