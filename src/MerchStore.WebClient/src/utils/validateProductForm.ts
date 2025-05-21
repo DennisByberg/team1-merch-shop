@@ -1,6 +1,5 @@
-import { INewProductForm } from '../types/globalInterfaces';
-
-export function validateProductForm(product: INewProductForm) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function validateProductForm(product: any) {
   const newErrors: { [key: string]: string } = {};
   if (!product.name.trim()) newErrors.name = 'Name is required';
   if (!product.description.trim()) newErrors.description = 'Description is required';
@@ -12,7 +11,7 @@ export function validateProductForm(product: INewProductForm) {
     Number(product.stockQuantity) < 0
   )
     newErrors.stockQuantity = 'Stock must be 0 or more';
-  if (!product.imageUrl.trim()) newErrors.imageUrl = 'Image URL is required';
+  if (!product.imageUrl?.trim()) newErrors.imageUrl = 'Image URL is required';
   // Optionally: validate imageUrl is a valid URL
   return newErrors;
 }

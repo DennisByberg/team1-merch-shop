@@ -175,7 +175,7 @@ export default function Header() {
                       }}
                     >
                       <LogoutIcon sx={{ mr: 1 }} />
-                      Logga ut
+                      Log out
                     </MenuItem>
                   </Menu>
                 </>

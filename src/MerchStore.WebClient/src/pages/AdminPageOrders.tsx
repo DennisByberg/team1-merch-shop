@@ -46,9 +46,7 @@ export default function AdminPageOrders() {
   const navigate = useNavigate();
 
   const handleViewOrder = (orderId: string) => {
-    // TODO: Navigate to a detailed order view page
-    console.log('View order:', orderId);
-    // Example: navigate(`/admin/orders/${orderId}`);
+    navigate(`/admin/orders/${orderId}`);
   };
 
   const handleDeleteOrder = (orderId: string) => {

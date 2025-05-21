@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Paper, TextField, Button, Typography, Alert } from '@mui/material';
 import { useAuth } from '../hooks/useAuth';
-import LoginIcon from '@mui/icons-material/Login';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { yellow } from '@mui/material/colors';
+import { redirectToLogin } from '../services/authService';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+
+const SSO_INIT_CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
+const SSO_INIT_CLIENT_SECRET = import.meta.env.VITE_CLIENT_SECRET;
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
@@ -13,6 +17,25 @@ export default function AdminLoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleOidcLogin = () => {
+    setError(null);
+
+    if (!SSO_INIT_CLIENT_ID || !SSO_INIT_CLIENT_SECRET) {
+      setError(
+        'SSO initiation credentials are not configured in the application environment.'
+      );
+      return;
+    }
+
+    if (username === SSO_INIT_CLIENT_ID && password === SSO_INIT_CLIENT_SECRET) {
+      redirectToLogin();
+    } else {
+      setError(
+        'Invalid Client ID or Client Secret to initiate SSO. Please use the configured admin credentials.'
+      );
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -73,21 +96,21 @@ export default function AdminLoginPage() {
           />
 
           <Button
-            type={'submit'}
             fullWidth
             variant={'contained'}
             color={'primary'}
-            endIcon={<LoginIcon />}
-            sx={{ mt: 3 }}
+            endIcon={<VpnKeyIcon />}
+            sx={{ mt: 8, mb: 1 }}
+            onClick={handleOidcLogin}
           >
-            Sign In
+            Sign In with Single Sign On (SSO)
           </Button>
 
           <Button
             fullWidth
             variant={'contained'}
             color={'inherit'}
-            sx={{ mt: 2 }}
+            sx={{ mt: 1 }}
             onClick={() => navigate(-1)}
           >
             Go Back
