@@ -1,6 +1,8 @@
 using MerchStore.Domain.Entities;
 using MerchStore.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MerchStore.Domain.Entities;
+
 
 namespace MerchStore.Infrastructure.Persistence.Repositories;
 
@@ -49,5 +51,36 @@ public class OrderRepository : IOrderRepository
     {
         _context.Orders.Remove(entity);
         await Task.CompletedTask;
+    }
+
+
+    public void Update(Order existingOrder, Order updatedOrder)
+    {
+        // Update the existing order with the new values
+        existingOrder.CustomerName = updatedOrder.CustomerName;
+        existingOrder.OrderDate = updatedOrder.OrderDate;
+        
+
+        // Update the order products
+        foreach (var orderProduct in updatedOrder.OrderProducts)
+        {
+            var existingOrderProduct = existingOrder.OrderProducts
+                .FirstOrDefault(op => op.ProductId == orderProduct.ProductId);
+
+            if (existingOrderProduct != null)
+            {
+                existingOrderProduct.Quantity = orderProduct.Quantity;
+            }
+            else
+            {
+                existingOrder.OrderProducts.Add(orderProduct);
+            }
+        }
+    }
+
+    public void Update(Order existingOrder)
+    {
+        // Update the existing order with the new values
+        _context.Entry(existingOrder).State = EntityState.Modified;
     }
 }

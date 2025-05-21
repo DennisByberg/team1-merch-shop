@@ -1,5 +1,6 @@
 using MerchStore.Domain.Common;
 using MerchStore.Domain.Enums;
+using MerchStore.Domain.ValueObjects;
 
 namespace MerchStore.Domain.Entities;
 
@@ -16,9 +17,22 @@ public class Order : Entity<Guid>
     public OrderStatus OrderStatus { get; private set; } = OrderStatus.Pending;
     public ICollection<OrderProducts> OrderProducts { get; set; } = [];
 
+    // Add properties to fix repository errors
+    public string CustomerName
+    {
+        get => FullName; // Alias for FullName
+        set => FullName = value;
+    }
+
+    public DateTime OrderDate { get; set; }
+    
+
+
     private Order()
     {
+        OrderDate = DateTime.UtcNow;
     } // Privat parameterlös konstruktor för EF Core
+    
     public Order(
         string fullName,
         string email,
@@ -29,6 +43,37 @@ public class Order : Entity<Guid>
         OrderStatus orderStatus,
         ICollection<OrderProducts> products
     ) : base(Guid.NewGuid())
+    {
+        ValidateFullName(fullName);
+        ValidateStreet(street);
+        ValidateProducts(products);
+        ValidateEmail(email);
+        ValidateCity(city);
+        ValidatePostalCode(postalCode);
+        ValidateCountry(country);
+
+        FullName = fullName;
+        Email = email;
+        Street = street;
+        PostalCode = postalCode;
+        City = city;
+        Country = country;
+        OrderStatus = orderStatus;
+        OrderProducts = products;
+    }
+    
+    // Constructor for updates with existing ID
+    public Order(
+        Guid id,
+        string fullName,
+        string email,
+        string street,
+        string postalCode,
+        string city,
+        string country,
+        OrderStatus orderStatus,
+        ICollection<OrderProducts> products
+    ) : base(id)
     {
         ValidateFullName(fullName);
         ValidateStreet(street);
