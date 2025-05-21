@@ -44,3 +44,21 @@ export type ReviewStats = {
   averageRating: number;
   reviewCount: number;
 };
+
+export interface INewOrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+  currency: string;
+}
+
+export interface INewOrder {
+  fullName: string;
+  email: string;
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  items: INewOrderItem[];
+  // orderStatus is set by the backend upon creation
+}
