@@ -178,10 +178,15 @@ var app = builder.Build();
 
 // Configure Forwarded Headers Middleware
 // This should be one of the first middleware components configured.
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+var forwardedHeadersOptions = new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+};
+// These are important for environments like Azure Container Apps
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 // Configure the HTTP request pipeline for the application
 if (app.Environment.IsDevelopment())

@@ -2,6 +2,8 @@
 const AUTH_SERVER_BASE_URL = import.meta.env.VITE_API_URL;
 const REDIRECT_URI = `${window.location.origin}/auth/callback`;
 
+console.log(window.location.origin);
+
 // Get client ID and secret from environment variables
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.VITE_CLIENT_SECRET;
