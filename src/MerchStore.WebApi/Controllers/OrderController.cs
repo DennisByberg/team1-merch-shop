@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MerchStore.Application.Services.Interfaces;
 using MerchStore.WebApi.Models.Dtos.Orders;
 using Microsoft.AspNetCore.Authorization;
+using OpenIddict.Validation.AspNetCore;
 
 namespace MerchStore.WebApi.Controllers;
 
@@ -18,6 +19,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public async Task<IActionResult> GetAll()
     {
         try
