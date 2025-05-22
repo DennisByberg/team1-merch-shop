@@ -14,6 +14,7 @@ export function getCrumbs(pathname: string, productName?: string): Crumb[] {
 
   // Handle different pages
   switch (parts[0]) {
+    // STORE
     case 'store':
       if (parts.length === 1) {
         crumbs.push({ label: 'Store' });
@@ -47,7 +48,13 @@ export function getCrumbs(pathname: string, productName?: string): Crumb[] {
         crumbs.push({ label: 'Products' });
       } else if (parts[1] === 'orders') {
         crumbs.push({ label: 'Admin', to: '/admin' });
-        crumbs.push({ label: 'Orders' });
+        if (parts.length === 2) {
+          crumbs.push({ label: 'Orders' });
+        } else if (parts.length === 3 && parts[2]) {
+          // If there's an orderId
+          crumbs.push({ label: 'Orders', to: '/admin/orders' });
+          crumbs.push({ label: parts[2] }); // Display the orderId
+        }
       }
       break;
   }
