@@ -7,6 +7,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  SelectChangeEvent,
   SxProps,
   Table,
   TableBody,
@@ -21,124 +22,59 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import CustomSpinner from '../components/CustomSpinner';
 import PageBreadcrumbs from '../components/PageBreadcrumbs';
-import { IAdminOrderDetailItem, IAdminOrderDetailView } from '../interfaces';
+import { IAdminOrderDetailItem } from '../interfaces';
 import { blue, green, grey, pink, purple } from '@mui/material/colors';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-const mockOrderDetail: IAdminOrderDetailView = {
-  id: '84e85190-a70d-40a0-8a90-629babfd9acb',
-  fullName: 'John Doe',
-  email: 'john.doe@example.com',
-  street: '123 Main St',
-  postalCode: '11111',
-  city: 'Stockholm',
-  country: 'Sweden',
-  orderStatus: 3,
-  items: [
-    {
-      orderItemId: 'item-1',
-      productId: 'prod-mug',
-      productName: 'Developer Mug',
-      quantity: 1,
-      unitPrice: 149.5,
-      lineItemTotalPrice: 149.5,
-      currency: 'SEK',
-    },
-    {
-      orderItemId: 'item-2',
-      productId: 'prod-tshirt',
-      productName: 'Conference T-Shirt',
-      quantity: 2,
-      unitPrice: 249.99,
-      lineItemTotalPrice: 499.98,
-      currency: 'SEK',
-    },
-  ],
-  totalOrderAmount: 649.48,
-  currency: 'SEK',
-};
-
-// Mapping for order status numbers to display strings
-const orderStatusMap: { [key: number]: string } = {
-  0: 'Pending',
-  1: 'Processing',
-  2: 'Shipped',
-  3: 'Delivered',
-  4: 'Cancelled',
-};
+import { mapOrderStatusToString } from '../utils/mapOrderStatusToString';
+import { useFetchOrderDetails } from '../hooks/useFetchOrderDetails';
+import toast from 'react-hot-toast';
+import { OrderStatusEnum } from '../enums/OrderStatusEnum';
 
 export default function AdminPageOrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
-  const [order, setOrder] = useState<IAdminOrderDetailView | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<number | string>('');
-  // const [isEditingShipping, setIsEditingShipping] = useState(false); // For future edit functionality
 
+  // Custom hook to fetch order details
+  const { order, loading, error } = useFetchOrderDetails(orderId);
+
+  // Extract enum values as numbers
+  const availableOrderStatuses = Object.values(OrderStatusEnum).filter(
+    (value) => typeof value === 'number'
+  ) as number[];
+
+  // State for the selected status in the dropdown
+  const [selectedStatus, setSelectedStatus] = useState<number | ''>('');
+
+  // Effect to update selectedStatus when the order data is loaded or changed by the hook
   useEffect(() => {
-    setLoading(true);
-    setError(null); // Reset error on new fetch
-    // TODO: Replace with actual API call:
-    // fetchOrder(orderId)
-    //   .then(data => {
-    //     if (data) {
-    //       setOrder(data);
-    //       setSelectedStatus(data.orderStatus);
-    //     } else {
-    //       setError('Order data not found.'); // Or handle as a specific case
-    //       setOrder(null);
-    //     }
-    //     setLoading(false);
-    //   })
-    //   .catch(err => {
-    //     console.error(err);
-    //     setError('Failed to fetch order details. Please try again later.');
-    //     setLoading(false);
-    //   });
-
-    // Using mock data for now
-    setTimeout(() => {
-      const foundOrder = { ...mockOrderDetail, id: orderId || mockOrderDetail.id };
-      setOrder(foundOrder);
-      setSelectedStatus(foundOrder.orderStatus);
-      setLoading(false);
-    }, 1000);
-  }, [orderId]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleStatusChange = (event: any) => {
-    setSelectedStatus(event.target.value as number);
-  };
-
-  const handleUpdateStatus = () => {
-    // TODO: Implement API call to update order status
-    console.log(`Updating status for order ${order?.id} to ${selectedStatus}`);
-    // Potentially update local state if API call is successful
     if (order) {
-      setOrder({ ...order, orderStatus: Number(selectedStatus) });
+      setSelectedStatus(order.orderStatus);
+    } else {
+      setSelectedStatus('');
     }
+  }, [order]);
+
+  const handleStatusChange = (event: SelectChangeEvent<number>) => {
+    setSelectedStatus(Number(event.target.value));
   };
 
+  // TODO: Implement API call to update order status
+  const handleUpdateStatus = () => {
+    if (!order) return;
+    console.log(`Updating status for order ${order.id} to ${selectedStatus}`);
+    toast('Status update API call - TBD');
+  };
+
+  // TODO: Implement logic to add a new item to the order
   const handleAddItem = () => {
-    // TODO: Implement logic to add a new item to the order
-    // This might involve opening a dialog to select a product and quantity
     alert('Add new item to order - TBD');
   };
 
+  // TODO: Implement API call to remove item from order
   const handleRemoveItem = (orderItemId: string) => {
-    // TODO: Implement API call to remove item from order
-    // And update local state
-    if (order) {
-      const updatedItems = order.items.filter((item) => item.orderItemId !== orderItemId);
-      const updatedTotal = updatedItems.reduce(
-        (sum, item) => sum + item.lineItemTotalPrice,
-        0
-      );
-      setOrder({ ...order, items: updatedItems, totalOrderAmount: updatedTotal });
-      alert(`Remove item ${orderItemId} - TBD`);
-    }
+    if (!order) return;
+    toast(`Remove item ${orderItemId} - TBD (API call needed)`);
   };
 
   return (
@@ -158,12 +94,11 @@ export default function AdminPageOrderDetail() {
       {/* Conditional content area */}
       {loading ? (
         <CustomSpinner text={'Loading order details...'} />
-      ) : error || !order ? ( // Combined check for error or if order is not found
+      ) : error || !order ? (
         <Box sx={CENTERED_CONTAINER_SX}>
           <Typography color={error ? 'error' : 'inherit'} gutterBottom>
             {error ? error : 'Order not found.'}
           </Typography>
-          {/* The "Back to Orders List" button is now always visible above, so it's removed from here */}
         </Box>
       ) : (
         <>
@@ -187,7 +122,7 @@ export default function AdminPageOrderDetail() {
                 <Typography variant={'body1'} component={'div'}>
                   Status:{' '}
                   <Box component={'span'}>
-                    {orderStatusMap[order.orderStatus] || 'Unknown'}
+                    {mapOrderStatusToString(order.orderStatus)}
                   </Box>
                 </Typography>
                 <Select
@@ -196,9 +131,9 @@ export default function AdminPageOrderDetail() {
                   size={'small'}
                   sx={{ minWidth: 150, mr: 1 }}
                 >
-                  {Object.entries(orderStatusMap).map(([key, value]) => (
-                    <MenuItem key={key} value={parseInt(key)}>
-                      {value}
+                  {availableOrderStatuses.map((statusNumber) => (
+                    <MenuItem key={statusNumber} value={statusNumber}>
+                      {mapOrderStatusToString(statusNumber)}
                     </MenuItem>
                   ))}
                 </Select>
@@ -227,7 +162,7 @@ export default function AdminPageOrderDetail() {
                 <Button
                   size={'small'}
                   startIcon={<EditIcon />}
-                  onClick={() => alert('Edit customer information - TBD')} // Placeholder for edit functionality
+                  onClick={() => alert('Edit customer information - TBD')}
                 >
                   Edit
                 </Button>
