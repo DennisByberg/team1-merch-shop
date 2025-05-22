@@ -20,15 +20,7 @@ if (builder.Environment.IsProduction())
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    var connString = builder.Configuration["DefaultMerchStoreDB"];
-    if (string.IsNullOrWhiteSpace(connString))
-    {
-        throw new InvalidOperationException("Missing DefaultMerchStoreDB secret in configuration.");
-    }
-
-    options.UseSqlServer(connString + ";Connection Timeout=60;");
-});
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") + ";Connection Timeout=60;"));
 
 // Add support for controllers (API endpoints)
 builder.Services.AddControllers();
