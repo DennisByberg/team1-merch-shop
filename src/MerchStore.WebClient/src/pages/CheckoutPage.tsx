@@ -57,7 +57,14 @@ export default function CheckoutPage() {
         city: form.city,
         postalCode: form.postalCode,
         country: form.country,
-        orderStatus: 'Pending', // eller annan defaultstatus
+        orderStatus: 0,
+
+        orderProducts: items.map((item) => ({
+          productId: item.id,
+          productName: item.name,
+          quantity: item.quantity,
+          unitPrice: item.price,
+        })),
       };
 
       // Skapa OrderItems för varje produkt i varukorgen
@@ -67,7 +74,7 @@ export default function CheckoutPage() {
         productId: item.id,
         quantity: item.quantity,
         price: item.price,
-        currency: item.currency,
+        currency: 'SEK',
       }));
 
       // Töm varukorgen efter ordern har lagts
