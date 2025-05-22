@@ -4,6 +4,7 @@ import { IOrder, INewOrder } from '../interfaces';
 const apiUrl: string = import.meta.env.VITE_API_URL;
 const apiKey: string = import.meta.env.VITE_API_KEY;
 
+// Get all orders
 export async function getOrders(): Promise<IOrder[]> {
   const token = localStorage.getItem('accessToken');
   const headers: Record<string, string> = {
@@ -21,6 +22,7 @@ export async function getOrders(): Promise<IOrder[]> {
   return response.data;
 }
 
+// Get a single order by ID
 export async function fetchOrder(id: string): Promise<IOrder> {
   const token = localStorage.getItem('accessToken');
   const headers: Record<string, string> = {
@@ -38,6 +40,7 @@ export async function fetchOrder(id: string): Promise<IOrder> {
   return response.data;
 }
 
+// Create a new order
 export async function createOrder(orderData: INewOrder): Promise<IOrder> {
   const token = localStorage.getItem('accessToken');
   const headers: Record<string, string> = {
@@ -50,9 +53,11 @@ export async function createOrder(orderData: INewOrder): Promise<IOrder> {
   const response = await axios.post<IOrder>(`${apiUrl}/api/orders`, orderData, {
     headers,
   });
+
   return response.data;
 }
 
+// Update an existing order
 export async function updateOrder(
   id: string,
   orderData: Partial<IOrder>

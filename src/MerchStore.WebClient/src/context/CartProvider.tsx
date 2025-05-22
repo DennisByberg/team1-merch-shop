@@ -4,18 +4,18 @@ import { CartContext } from './CartContext';
 
 export type CartItem = IProduct & { quantity: number };
 
-const CART_KEY = 'cart';
-
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(() => {
-    const stored = localStorage.getItem(CART_KEY);
+    const stored = localStorage.getItem('cart');
     return stored ? JSON.parse(stored) : [];
   });
 
+  // Load cart items from localStorage when the component mounts
   useEffect(() => {
-    localStorage.setItem(CART_KEY, JSON.stringify(items));
+    localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
 
+  // Add a product to the cart
   function addToCart(product: IProduct) {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -28,6 +28,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }
 
+  // Increase the quantity of a product in the cart
   function increaseQuantity(id: string) {
     setItems((prev) =>
       prev.map((item) =>
@@ -36,6 +37,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }
 
+  // Decrease the quantity of a product in the cart
   function decreaseQuantity(id: string) {
     setItems((prev) =>
       prev
@@ -44,11 +46,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }
 
+  // Remove a product from the cart
   function removeItem(id: string) {
     setItems((prev) => prev.filter((item) => item.id !== id));
   }
 
-  const getTotalProductCount = () => items.reduce((sum, item) => sum + item.quantity, 0);
+  // Clear the cart
+  function clearCart() {
+    setItems([]);
+  }
+
+  // Get the total product count in the cart
+  function getTotalProductCount() {
+    return items.reduce((sum, item) => sum + item.quantity, 0);
+  }
 
   return (
     <CartContext.Provider
@@ -59,6 +70,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         decreaseQuantity,
         removeItem,
         getTotalProductCount,
+        clearCart,
       }}
     >
       {children}
