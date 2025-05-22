@@ -30,13 +30,15 @@ import { mapOrderStatusToString } from '../utils/mapOrderStatusToString';
 import { useFetchOrderDetails } from '../hooks/useFetchOrderDetails';
 import toast from 'react-hot-toast';
 import { OrderStatusEnum } from '../enums/OrderStatusEnum';
+import { updateOrder } from '../api/orderApi';
+import EditCustomerDialog from '../components/Admin/EditCustomerDialog';
 
 export default function AdminPageOrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
 
   // Custom hook to fetch order details
-  const { order, loading, error } = useFetchOrderDetails(orderId);
+  const { order, loading, error, refetchOrder } = useFetchOrderDetails(orderId);
 
   // Extract enum values as numbers
   const availableOrderStatuses = Object.values(OrderStatusEnum).filter(
@@ -45,6 +47,9 @@ export default function AdminPageOrderDetail() {
 
   // State for the selected status in the dropdown
   const [selectedStatus, setSelectedStatus] = useState<number | ''>('');
+
+  // State for edit customer dialog
+  const [editCustomerDialogOpen, setEditCustomerDialogOpen] = useState(false);
 
   // Effect to update selectedStatus when the order data is loaded or changed by the hook
   useEffect(() => {
@@ -55,6 +60,7 @@ export default function AdminPageOrderDetail() {
     }
   }, [order]);
 
+  // Handler for status change in the dropdown
   const handleStatusChange = (event: SelectChangeEvent<number>) => {
     setSelectedStatus(Number(event.target.value));
   };
@@ -68,13 +74,47 @@ export default function AdminPageOrderDetail() {
 
   // TODO: Implement logic to add a new item to the order
   const handleAddItem = () => {
-    alert('Add new item to order - TBD');
+    toast('Add new item to order - TBD');
   };
 
   // TODO: Implement API call to remove item from order
   const handleRemoveItem = (orderItemId: string) => {
     if (!order) return;
     toast(`Remove item ${orderItemId} - TBD (API call needed)`);
+  };
+
+  // Handle edit customer information
+  const handleEditCustomer = () => {
+    setEditCustomerDialogOpen(true);
+  };
+
+  const handleSaveCustomer = async (customerData: {
+    fullName: string;
+    email: string;
+  }) => {
+    if (!order) return;
+
+    // Create the complete order object that the API expects
+    const updatedOrderData = {
+      id: order.id,
+      fullName: customerData.fullName,
+      email: customerData.email,
+      street: order.street,
+      postalCode: order.postalCode,
+      city: order.city,
+      country: order.country,
+      orderStatus: order.orderStatus,
+      orderProducts: order.items.map((item) => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })),
+    };
+
+    await updateOrder(order.id, updatedOrderData);
+
+    refetchOrder();
   };
 
   return (
@@ -162,7 +202,7 @@ export default function AdminPageOrderDetail() {
                 <Button
                   size={'small'}
                   startIcon={<EditIcon />}
-                  onClick={() => alert('Edit customer information - TBD')}
+                  onClick={handleEditCustomer}
                 >
                   Edit
                 </Button>
@@ -187,7 +227,7 @@ export default function AdminPageOrderDetail() {
                 <Button
                   size={'small'}
                   startIcon={<EditIcon />}
-                  onClick={() => alert('Edit shipping address - TBD')}
+                  onClick={() => toast('Edit shipping address - TBD')}
                 >
                   Edit
                 </Button>
@@ -229,12 +269,11 @@ export default function AdminPageOrderDetail() {
                     <TableCell align={'right'}>Price</TableCell>
                     <TableCell align={'center'}>Quantity</TableCell>
                     <TableCell align={'right'}>Subtotal</TableCell>
-                    <TableCell align={'center'}>Actions</TableCell>{' '}
-                    {/* New Actions column */}
+                    <TableCell align={'center'}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {order.items.map((item: IAdminOrderDetailItem) => (
+                  {(order.items || []).map((item: IAdminOrderDetailItem) => (
                     <TableRow key={item.orderItemId}>
                       <TableCell>{item.productName}</TableCell>
                       <TableCell align={'right'}>
@@ -275,6 +314,19 @@ export default function AdminPageOrderDetail() {
               </Table>
             </TableContainer>
           </Paper>
+
+          {/* Edit Customer Dialog - Moved outside cards container */}
+          {order && (
+            <EditCustomerDialog
+              open={editCustomerDialogOpen}
+              onClose={() => setEditCustomerDialogOpen(false)}
+              onSave={handleSaveCustomer}
+              initialData={{
+                fullName: order.fullName,
+                email: order.email,
+              }}
+            />
+          )}
         </>
       )}
     </Box>

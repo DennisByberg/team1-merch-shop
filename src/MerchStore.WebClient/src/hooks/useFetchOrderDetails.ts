@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { fetchOrder } from '../api/orderApi';
 import { IOrder, IAdminOrderDetailView, INewOrderItem } from '../interfaces';
@@ -20,6 +20,7 @@ const transformOrderToDetailView = (fetchedOrder: IOrder): IAdminOrderDetailView
     })
   );
 
+  // Calculate total order amount
   const totalOrderAmount = items.reduce((sum, item) => sum + item.lineItemTotalPrice, 0);
 
   return {
@@ -47,6 +48,31 @@ export function useFetchOrderDetails(orderId: string | undefined) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchOrderData = useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const fetchedOrder = await fetchOrder(id);
+      const orderDetailView = transformOrderToDetailView(fetchedOrder);
+      setOrder(orderDetailView);
+    } catch (err) {
+      console.error('Failed to fetch order details in hook:', err);
+      const errorMessage = getErrorMessage(err);
+      setError(`Failed to load order details: ${errorMessage}`);
+      toast.error('Failed to load order details.');
+      setOrder(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const refetchOrder = useCallback(() => {
+    if (orderId) {
+      fetchOrderData(orderId);
+    }
+  }, [orderId, fetchOrderData]);
+
   useEffect(() => {
     if (!orderId) {
       setError('Order ID is missing.');
@@ -55,28 +81,8 @@ export function useFetchOrderDetails(orderId: string | undefined) {
       return;
     }
 
-    const loadOrderDetails = async () => {
-      setLoading(true);
-      setError(null);
-      setOrder(null);
+    fetchOrderData(orderId);
+  }, [orderId, fetchOrderData]);
 
-      try {
-        const fetchedOrder = await fetchOrder(orderId);
-        const orderDetailView = transformOrderToDetailView(fetchedOrder);
-        setOrder(orderDetailView);
-      } catch (err) {
-        console.error('Failed to fetch order details in hook:', err);
-        const errorMessage = getErrorMessage(err);
-        setError(`Failed to load order details: ${errorMessage}`);
-        toast.error('Failed to load order details.');
-        setOrder(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadOrderDetails();
-  }, [orderId]);
-
-  return { order, loading, error };
+  return { order, loading, error, refetchOrder };
 }
