@@ -32,6 +32,7 @@ import toast from 'react-hot-toast';
 import { OrderStatusEnum } from '../enums/OrderStatusEnum';
 import { updateOrder } from '../api/orderApi';
 import EditCustomerDialog from '../components/Admin/EditCustomerDialog';
+import EditShippingAddressDialog from '../components/Admin/EditShippingAddressDialog';
 
 export default function AdminPageOrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -48,8 +49,9 @@ export default function AdminPageOrderDetail() {
   // State for the selected status in the dropdown
   const [selectedStatus, setSelectedStatus] = useState<number | ''>('');
 
-  // State for edit customer dialog
+  // State for edit dialogs
   const [editCustomerDialogOpen, setEditCustomerDialogOpen] = useState(false);
+  const [editShippingDialogOpen, setEditShippingDialogOpen] = useState(false);
 
   // Effect to update selectedStatus when the order data is loaded or changed by the hook
   useEffect(() => {
@@ -114,6 +116,41 @@ export default function AdminPageOrderDetail() {
 
     await updateOrder(order.id, updatedOrderData);
 
+    refetchOrder();
+  };
+
+  // Handle edit shipping address
+  const handleEditShippingAddress = () => {
+    setEditShippingDialogOpen(true);
+  };
+
+  const handleSaveShippingAddress = async (shippingData: {
+    street: string;
+    postalCode: string;
+    city: string;
+    country: string;
+  }) => {
+    if (!order) return;
+
+    // Create the complete order object that the API expects
+    const updatedOrderData = {
+      id: order.id,
+      fullName: order.fullName,
+      email: order.email,
+      street: shippingData.street,
+      postalCode: shippingData.postalCode,
+      city: shippingData.city,
+      country: shippingData.country,
+      orderStatus: order.orderStatus,
+      orderProducts: order.items.map((item) => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })),
+    };
+
+    await updateOrder(order.id, updatedOrderData);
     refetchOrder();
   };
 
@@ -227,7 +264,7 @@ export default function AdminPageOrderDetail() {
                 <Button
                   size={'small'}
                   startIcon={<EditIcon />}
-                  onClick={() => toast('Edit shipping address - TBD')}
+                  onClick={handleEditShippingAddress}
                 >
                   Edit
                 </Button>
@@ -315,17 +352,30 @@ export default function AdminPageOrderDetail() {
             </TableContainer>
           </Paper>
 
-          {/* Edit Customer Dialog - Moved outside cards container */}
+          {/* Edit Dialogs */}
           {order && (
-            <EditCustomerDialog
-              open={editCustomerDialogOpen}
-              onClose={() => setEditCustomerDialogOpen(false)}
-              onSave={handleSaveCustomer}
-              initialData={{
-                fullName: order.fullName,
-                email: order.email,
-              }}
-            />
+            <>
+              <EditCustomerDialog
+                open={editCustomerDialogOpen}
+                onClose={() => setEditCustomerDialogOpen(false)}
+                onSave={handleSaveCustomer}
+                initialData={{
+                  fullName: order.fullName,
+                  email: order.email,
+                }}
+              />
+              <EditShippingAddressDialog
+                open={editShippingDialogOpen}
+                onClose={() => setEditShippingDialogOpen(false)}
+                onSave={handleSaveShippingAddress}
+                initialData={{
+                  street: order.street,
+                  postalCode: order.postalCode,
+                  city: order.city,
+                  country: order.country,
+                }}
+              />
+            </>
           )}
         </>
       )}
