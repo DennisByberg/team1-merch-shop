@@ -1,3 +1,5 @@
+import { OrderStatusEnum } from './enums/OrderStatusEnum';
+
 // A single product item in the product list [  /api/products/{id}  ]
 export interface IProduct {
   id: string;
@@ -18,7 +20,7 @@ export interface IOrder {
   city: string;
   postalCode: string;
   country: string;
-  orderStatus: number;
+  orderStatus: OrderStatusEnum;
   orderProducts: INewOrderItem[];
 }
 
@@ -28,7 +30,7 @@ export type OrderItem = {
   productId: string;
   quantity: number;
   price: number;
-  currency: string;
+  currency: 'SEK';
 };
 
 export type Review = {
@@ -76,11 +78,11 @@ export interface IAdminOrderDetailView {
   postalCode: string;
   city: string;
   country: string;
-  orderStatus: number;
+  orderStatus: OrderStatusEnum;
   items: IAdminOrderDetailItem[];
 
   totalOrderAmount: number;
-  currency: string;
+  currency: 'SEK';
 }
 
 // Represents a single item within the detailed order view for an admin.
@@ -92,5 +94,5 @@ export interface IAdminOrderDetailItem {
   unitPrice: number;
 
   lineItemTotalPrice: number;
-  currency: string;
+  currency: 'SEK';
 }

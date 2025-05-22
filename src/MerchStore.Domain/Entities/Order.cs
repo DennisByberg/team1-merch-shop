@@ -25,14 +25,14 @@ public class Order : Entity<Guid>
     }
 
     public DateTime OrderDate { get; set; }
-    
+
 
 
     private Order()
     {
         OrderDate = DateTime.UtcNow;
     } // Privat parameterlös konstruktor för EF Core
-    
+
     public Order(
         string fullName,
         string email,
@@ -61,7 +61,7 @@ public class Order : Entity<Guid>
         OrderStatus = orderStatus;
         OrderProducts = products;
     }
-    
+
     // Constructor for updates with existing ID
     public Order(
         Guid id,
@@ -93,6 +93,30 @@ public class Order : Entity<Guid>
         OrderProducts = products;
     }
 
+    public void UpdateCustomerInfo(string fullName, string email, string street, string postalCode, string city, string country)
+    {
+        // Validera all input innan uppdatering
+        ValidateFullName(fullName);
+        ValidateEmail(email);
+        ValidateStreet(street);
+        ValidatePostalCode(postalCode);
+        ValidateCity(city);
+        ValidateCountry(country);
+
+        // Uppdatera properties först efter validering
+        FullName = fullName;
+        Email = email;
+        Street = street;
+        PostalCode = postalCode;
+        City = city;
+        Country = country;
+    }
+
+    public void UpdateStatus(OrderStatus status)
+    {
+        OrderStatus = status;
+    }
+
     private void ValidateProducts(ICollection<OrderProducts> products)
     {
         if (products == null || products.Count == 0)
@@ -108,6 +132,7 @@ public class Order : Entity<Guid>
             }
         }
     }
+
     private void ValidateEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))

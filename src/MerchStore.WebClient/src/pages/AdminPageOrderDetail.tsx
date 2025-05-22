@@ -7,6 +7,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  SelectChangeEvent,
   SxProps,
   Table,
   TableBody,
@@ -21,124 +22,184 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import CustomSpinner from '../components/CustomSpinner';
 import PageBreadcrumbs from '../components/PageBreadcrumbs';
-import { IAdminOrderDetailItem, IAdminOrderDetailView } from '../interfaces';
+import { IAdminOrderDetailItem } from '../interfaces';
 import { blue, green, grey, pink, purple } from '@mui/material/colors';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-const mockOrderDetail: IAdminOrderDetailView = {
-  id: '84e85190-a70d-40a0-8a90-629babfd9acb',
-  fullName: 'John Doe',
-  email: 'john.doe@example.com',
-  street: '123 Main St',
-  postalCode: '11111',
-  city: 'Stockholm',
-  country: 'Sweden',
-  orderStatus: 3,
-  items: [
-    {
-      orderItemId: 'item-1',
-      productId: 'prod-mug',
-      productName: 'Developer Mug',
-      quantity: 1,
-      unitPrice: 149.5,
-      lineItemTotalPrice: 149.5,
-      currency: 'SEK',
-    },
-    {
-      orderItemId: 'item-2',
-      productId: 'prod-tshirt',
-      productName: 'Conference T-Shirt',
-      quantity: 2,
-      unitPrice: 249.99,
-      lineItemTotalPrice: 499.98,
-      currency: 'SEK',
-    },
-  ],
-  totalOrderAmount: 649.48,
-  currency: 'SEK',
-};
-
-// Mapping for order status numbers to display strings
-const orderStatusMap: { [key: number]: string } = {
-  0: 'Pending',
-  1: 'Processing',
-  2: 'Shipped',
-  3: 'Delivered',
-  4: 'Cancelled',
-};
+import { mapOrderStatusToString } from '../utils/mapOrderStatusToString';
+import { useFetchOrderDetails } from '../hooks/useFetchOrderDetails';
+import toast from 'react-hot-toast';
+import { OrderStatusEnum } from '../enums/OrderStatusEnum';
+import { addItemToOrder, updateOrder } from '../api/orderApi';
+import EditCustomerDialog from '../components/Admin/EditCustomerDialog';
+import EditShippingAddressDialog from '../components/Admin/EditShippingAddressDialog';
+import AddOrderItemDialog from '../components/Admin/AddOrderItemDialog';
 
 export default function AdminPageOrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
-  const [order, setOrder] = useState<IAdminOrderDetailView | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<number | string>('');
-  // const [isEditingShipping, setIsEditingShipping] = useState(false); // For future edit functionality
 
+  // Custom hook to fetch order details
+  const { order, loading, error, refetchOrder } = useFetchOrderDetails(orderId);
+
+  // Extract enum values as numbers
+  const availableOrderStatuses = Object.values(OrderStatusEnum).filter(
+    (value) => typeof value === 'number'
+  ) as number[];
+
+  // State for the selected status in the dropdown
+  const [selectedStatus, setSelectedStatus] = useState<number | ''>('');
+
+  // dialog states
+  const [editCustomerDialogOpen, setEditCustomerDialogOpen] = useState(false);
+  const [editShippingDialogOpen, setEditShippingDialogOpen] = useState(false);
+  const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
+
+  // State for status update loading
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+  // Effect to update selectedStatus when the order data is loaded or changed by the hook
   useEffect(() => {
-    setLoading(true);
-    setError(null); // Reset error on new fetch
-    // TODO: Replace with actual API call:
-    // fetchOrder(orderId)
-    //   .then(data => {
-    //     if (data) {
-    //       setOrder(data);
-    //       setSelectedStatus(data.orderStatus);
-    //     } else {
-    //       setError('Order data not found.'); // Or handle as a specific case
-    //       setOrder(null);
-    //     }
-    //     setLoading(false);
-    //   })
-    //   .catch(err => {
-    //     console.error(err);
-    //     setError('Failed to fetch order details. Please try again later.');
-    //     setLoading(false);
-    //   });
-
-    // Using mock data for now
-    setTimeout(() => {
-      const foundOrder = { ...mockOrderDetail, id: orderId || mockOrderDetail.id };
-      setOrder(foundOrder);
-      setSelectedStatus(foundOrder.orderStatus);
-      setLoading(false);
-    }, 1000);
-  }, [orderId]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleStatusChange = (event: any) => {
-    setSelectedStatus(event.target.value as number);
-  };
-
-  const handleUpdateStatus = () => {
-    // TODO: Implement API call to update order status
-    console.log(`Updating status for order ${order?.id} to ${selectedStatus}`);
-    // Potentially update local state if API call is successful
     if (order) {
-      setOrder({ ...order, orderStatus: Number(selectedStatus) });
+      setSelectedStatus(order.orderStatus);
+    } else {
+      setSelectedStatus('');
     }
+  }, [order]);
+
+  // Handler for status change in the dropdown
+  const handleStatusChange = (event: SelectChangeEvent<number>) => {
+    setSelectedStatus(Number(event.target.value));
   };
 
-  const handleAddItem = () => {
-    // TODO: Implement logic to add a new item to the order
-    // This might involve opening a dialog to select a product and quantity
-    alert('Add new item to order - TBD');
-  };
+  // TODO: Implement API call to update order status
+  const handleUpdateStatus = async () => {
+    if (!order || selectedStatus === '') return;
 
-  const handleRemoveItem = (orderItemId: string) => {
-    // TODO: Implement API call to remove item from order
-    // And update local state
-    if (order) {
-      const updatedItems = order.items.filter((item) => item.orderItemId !== orderItemId);
-      const updatedTotal = updatedItems.reduce(
-        (sum, item) => sum + item.lineItemTotalPrice,
-        0
+    setIsUpdatingStatus(true);
+    try {
+      // Create the complete order object that the API expects
+      const updatedOrderData = {
+        id: order.id,
+        fullName: order.fullName,
+        email: order.email,
+        street: order.street,
+        postalCode: order.postalCode,
+        city: order.city,
+        country: order.country,
+        orderStatus: Number(selectedStatus),
+        orderProducts: order.items.map((item) => ({
+          productId: item.productId,
+          productName: item.productName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        })),
+      };
+
+      await updateOrder(order.id, updatedOrderData);
+      toast.success(
+        `Order status updated to ${mapOrderStatusToString(Number(selectedStatus))}`
       );
-      setOrder({ ...order, items: updatedItems, totalOrderAmount: updatedTotal });
-      alert(`Remove item ${orderItemId} - TBD`);
+      refetchOrder();
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      toast.error('Failed to update order status');
+    } finally {
+      setIsUpdatingStatus(false);
     }
+  };
+
+  // Update the handleAddItem function
+  const handleAddItem = () => {
+    setAddItemDialogOpen(true);
+  };
+
+  // Add a function to handle saving the new item
+  const handleSaveNewItem = async (itemData: { productId: string; quantity: number }) => {
+    if (!order) return;
+
+    try {
+      await addItemToOrder(order.id, itemData.productId, itemData.quantity);
+      refetchOrder();
+    } catch (error) {
+      console.error('Failed to add item to order:', error);
+      throw error; // Rethrow to be handled by the dialog
+    }
+  };
+
+  // TODO: Implement API call to remove item from order
+  const handleRemoveItem = (orderItemId: string) => {
+    if (!order) return;
+    toast(`Remove item ${orderItemId} - TBD (API call needed)`);
+  };
+
+  // Handle edit customer information
+  const handleEditCustomer = () => {
+    setEditCustomerDialogOpen(true);
+  };
+
+  const handleSaveCustomer = async (customerData: {
+    fullName: string;
+    email: string;
+  }) => {
+    if (!order) return;
+
+    // Create the complete order object that the API expects
+    const updatedOrderData = {
+      id: order.id,
+      fullName: customerData.fullName,
+      email: customerData.email,
+      street: order.street,
+      postalCode: order.postalCode,
+      city: order.city,
+      country: order.country,
+      orderStatus: order.orderStatus,
+      orderProducts: order.items.map((item) => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })),
+    };
+
+    await updateOrder(order.id, updatedOrderData);
+
+    refetchOrder();
+  };
+
+  // Handle edit shipping address
+  const handleEditShippingAddress = () => {
+    setEditShippingDialogOpen(true);
+  };
+
+  const handleSaveShippingAddress = async (shippingData: {
+    street: string;
+    postalCode: string;
+    city: string;
+    country: string;
+  }) => {
+    if (!order) return;
+
+    // Create the complete order object that the API expects
+    const updatedOrderData = {
+      id: order.id,
+      fullName: order.fullName,
+      email: order.email,
+      street: shippingData.street,
+      postalCode: shippingData.postalCode,
+      city: shippingData.city,
+      country: shippingData.country,
+      orderStatus: order.orderStatus,
+      orderProducts: order.items.map((item) => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })),
+    };
+
+    await updateOrder(order.id, updatedOrderData);
+    refetchOrder();
   };
 
   return (
@@ -158,12 +219,11 @@ export default function AdminPageOrderDetail() {
       {/* Conditional content area */}
       {loading ? (
         <CustomSpinner text={'Loading order details...'} />
-      ) : error || !order ? ( // Combined check for error or if order is not found
+      ) : error || !order ? (
         <Box sx={CENTERED_CONTAINER_SX}>
           <Typography color={error ? 'error' : 'inherit'} gutterBottom>
             {error ? error : 'Order not found.'}
           </Typography>
-          {/* The "Back to Orders List" button is now always visible above, so it's removed from here */}
         </Box>
       ) : (
         <>
@@ -187,7 +247,7 @@ export default function AdminPageOrderDetail() {
                 <Typography variant={'body1'} component={'div'}>
                   Status:{' '}
                   <Box component={'span'}>
-                    {orderStatusMap[order.orderStatus] || 'Unknown'}
+                    {mapOrderStatusToString(order.orderStatus)}
                   </Box>
                 </Typography>
                 <Select
@@ -196,9 +256,9 @@ export default function AdminPageOrderDetail() {
                   size={'small'}
                   sx={{ minWidth: 150, mr: 1 }}
                 >
-                  {Object.entries(orderStatusMap).map(([key, value]) => (
-                    <MenuItem key={key} value={parseInt(key)}>
-                      {value}
+                  {availableOrderStatuses.map((statusNumber) => (
+                    <MenuItem key={statusNumber} value={statusNumber}>
+                      {mapOrderStatusToString(statusNumber)}
                     </MenuItem>
                   ))}
                 </Select>
@@ -206,9 +266,11 @@ export default function AdminPageOrderDetail() {
                   variant={'contained'}
                   size={'small'}
                   onClick={handleUpdateStatus}
-                  disabled={Number(selectedStatus) === order.orderStatus}
+                  disabled={
+                    Number(selectedStatus) === order.orderStatus || isUpdatingStatus
+                  }
                 >
-                  Update
+                  {isUpdatingStatus ? 'Updating...' : 'Update'}
                 </Button>
               </Box>
             </Paper>
@@ -227,7 +289,7 @@ export default function AdminPageOrderDetail() {
                 <Button
                   size={'small'}
                   startIcon={<EditIcon />}
-                  onClick={() => alert('Edit customer information - TBD')} // Placeholder for edit functionality
+                  onClick={handleEditCustomer}
                 >
                   Edit
                 </Button>
@@ -252,7 +314,7 @@ export default function AdminPageOrderDetail() {
                 <Button
                   size={'small'}
                   startIcon={<EditIcon />}
-                  onClick={() => alert('Edit shipping address - TBD')}
+                  onClick={handleEditShippingAddress}
                 >
                   Edit
                 </Button>
@@ -294,12 +356,11 @@ export default function AdminPageOrderDetail() {
                     <TableCell align={'right'}>Price</TableCell>
                     <TableCell align={'center'}>Quantity</TableCell>
                     <TableCell align={'right'}>Subtotal</TableCell>
-                    <TableCell align={'center'}>Actions</TableCell>{' '}
-                    {/* New Actions column */}
+                    <TableCell align={'center'}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {order.items.map((item: IAdminOrderDetailItem) => (
+                  {(order.items || []).map((item: IAdminOrderDetailItem) => (
                     <TableRow key={item.orderItemId}>
                       <TableCell>{item.productName}</TableCell>
                       <TableCell align={'right'}>
@@ -340,6 +401,40 @@ export default function AdminPageOrderDetail() {
               </Table>
             </TableContainer>
           </Paper>
+
+          {/* Dialogs */}
+          {order && (
+            <>
+              {/* Customer Information */}
+              <EditCustomerDialog
+                open={editCustomerDialogOpen}
+                onClose={() => setEditCustomerDialogOpen(false)}
+                onSave={handleSaveCustomer}
+                initialData={{
+                  fullName: order.fullName,
+                  email: order.email,
+                }}
+              />
+              {/* Shipping Address */}
+              <EditShippingAddressDialog
+                open={editShippingDialogOpen}
+                onClose={() => setEditShippingDialogOpen(false)}
+                onSave={handleSaveShippingAddress}
+                initialData={{
+                  street: order.street,
+                  postalCode: order.postalCode,
+                  city: order.city,
+                  country: order.country,
+                }}
+              />
+              {/* Add Order Item */}
+              <AddOrderItemDialog
+                open={addItemDialogOpen}
+                onClose={() => setAddItemDialogOpen(false)}
+                onSave={handleSaveNewItem}
+              />
+            </>
+          )}
         </>
       )}
     </Box>
