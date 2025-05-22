@@ -53,6 +53,9 @@ export default function AdminPageOrderDetail() {
   const [editCustomerDialogOpen, setEditCustomerDialogOpen] = useState(false);
   const [editShippingDialogOpen, setEditShippingDialogOpen] = useState(false);
 
+  // State for status update loading
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
   // Effect to update selectedStatus when the order data is loaded or changed by the hook
   useEffect(() => {
     if (order) {
@@ -68,10 +71,40 @@ export default function AdminPageOrderDetail() {
   };
 
   // TODO: Implement API call to update order status
-  const handleUpdateStatus = () => {
-    if (!order) return;
-    console.log(`Updating status for order ${order.id} to ${selectedStatus}`);
-    toast('Status update API call - TBD');
+  const handleUpdateStatus = async () => {
+    if (!order || selectedStatus === '') return;
+
+    setIsUpdatingStatus(true);
+    try {
+      // Create the complete order object that the API expects
+      const updatedOrderData = {
+        id: order.id,
+        fullName: order.fullName,
+        email: order.email,
+        street: order.street,
+        postalCode: order.postalCode,
+        city: order.city,
+        country: order.country,
+        orderStatus: Number(selectedStatus),
+        orderProducts: order.items.map((item) => ({
+          productId: item.productId,
+          productName: item.productName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        })),
+      };
+
+      await updateOrder(order.id, updatedOrderData);
+      toast.success(
+        `Order status updated to ${mapOrderStatusToString(Number(selectedStatus))}`
+      );
+      refetchOrder();
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      toast.error('Failed to update order status');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
   };
 
   // TODO: Implement logic to add a new item to the order
@@ -218,9 +251,11 @@ export default function AdminPageOrderDetail() {
                   variant={'contained'}
                   size={'small'}
                   onClick={handleUpdateStatus}
-                  disabled={Number(selectedStatus) === order.orderStatus}
+                  disabled={
+                    Number(selectedStatus) === order.orderStatus || isUpdatingStatus
+                  }
                 >
-                  Update
+                  {isUpdatingStatus ? 'Updating...' : 'Update'}
                 </Button>
               </Box>
             </Paper>
