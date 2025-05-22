@@ -77,4 +77,27 @@ export async function updateOrder(
   return response.data;
 }
 
-// TODO: addItemToOrder
+// Add an item to an order
+export async function addItemToOrder(
+  orderId: string,
+  productId: string,
+  quantity: number
+): Promise<IOrder> {
+  const token = localStorage.getItem('accessToken');
+  const headers: Record<string, string> = { 'X-API-Key': apiKey };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  // The API expects a request body with quantity
+  const body = { quantity };
+
+  const response = await axios.post<IOrder>(
+    `${apiUrl}/api/orders/${orderId}/items/${productId}`,
+    body,
+    { headers }
+  );
+
+  return response.data;
+}

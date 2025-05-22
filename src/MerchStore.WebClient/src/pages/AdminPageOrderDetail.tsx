@@ -30,9 +30,10 @@ import { mapOrderStatusToString } from '../utils/mapOrderStatusToString';
 import { useFetchOrderDetails } from '../hooks/useFetchOrderDetails';
 import toast from 'react-hot-toast';
 import { OrderStatusEnum } from '../enums/OrderStatusEnum';
-import { updateOrder } from '../api/orderApi';
+import { addItemToOrder, updateOrder } from '../api/orderApi';
 import EditCustomerDialog from '../components/Admin/EditCustomerDialog';
 import EditShippingAddressDialog from '../components/Admin/EditShippingAddressDialog';
+import AddOrderItemDialog from '../components/Admin/AddOrderItemDialog';
 
 export default function AdminPageOrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -49,9 +50,10 @@ export default function AdminPageOrderDetail() {
   // State for the selected status in the dropdown
   const [selectedStatus, setSelectedStatus] = useState<number | ''>('');
 
-  // State for edit dialogs
+  // dialog states
   const [editCustomerDialogOpen, setEditCustomerDialogOpen] = useState(false);
   const [editShippingDialogOpen, setEditShippingDialogOpen] = useState(false);
+  const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
 
   // State for status update loading
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -107,9 +109,22 @@ export default function AdminPageOrderDetail() {
     }
   };
 
-  // TODO: Implement logic to add a new item to the order
+  // Update the handleAddItem function
   const handleAddItem = () => {
-    toast('Add new item to order - TBD');
+    setAddItemDialogOpen(true);
+  };
+
+  // Add a function to handle saving the new item
+  const handleSaveNewItem = async (itemData: { productId: string; quantity: number }) => {
+    if (!order) return;
+
+    try {
+      await addItemToOrder(order.id, itemData.productId, itemData.quantity);
+      refetchOrder();
+    } catch (error) {
+      console.error('Failed to add item to order:', error);
+      throw error; // Rethrow to be handled by the dialog
+    }
   };
 
   // TODO: Implement API call to remove item from order
@@ -387,9 +402,10 @@ export default function AdminPageOrderDetail() {
             </TableContainer>
           </Paper>
 
-          {/* Edit Dialogs */}
+          {/* Dialogs */}
           {order && (
             <>
+              {/* Customer Information */}
               <EditCustomerDialog
                 open={editCustomerDialogOpen}
                 onClose={() => setEditCustomerDialogOpen(false)}
@@ -399,6 +415,7 @@ export default function AdminPageOrderDetail() {
                   email: order.email,
                 }}
               />
+              {/* Shipping Address */}
               <EditShippingAddressDialog
                 open={editShippingDialogOpen}
                 onClose={() => setEditShippingDialogOpen(false)}
@@ -409,6 +426,12 @@ export default function AdminPageOrderDetail() {
                   city: order.city,
                   country: order.country,
                 }}
+              />
+              {/* Add Order Item */}
+              <AddOrderItemDialog
+                open={addItemDialogOpen}
+                onClose={() => setAddItemDialogOpen(false)}
+                onSave={handleSaveNewItem}
               />
             </>
           )}
