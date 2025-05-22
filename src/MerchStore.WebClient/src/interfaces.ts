@@ -18,7 +18,8 @@ export interface IOrder {
   city: string;
   postalCode: string;
   country: string;
-  orderStatus: string;
+  orderStatus: number;
+  orderProducts: INewOrderItem[];
 }
 
 export type OrderItem = {
@@ -49,20 +50,19 @@ export type ReviewStats = {
 
 export interface INewOrderItem {
   productId: string;
+  productName: string;
   quantity: number;
-  price: number;
-  currency: string;
+  unitPrice: number;
 }
 
 export interface INewOrder {
   fullName: string;
   email: string;
   street: string;
-  city: string;
   postalCode: string;
+  city: string;
   country: string;
-  items: INewOrderItem[];
-  // orderStatus is set by the backend upon creation
+  orderProducts: INewOrderItem[];
 }
 
 // --- TYPES FOR THE ADMIN ORDER DETAIL VIEW (/admin/orders/:orderId) ---
@@ -76,12 +76,11 @@ export interface IAdminOrderDetailView {
   postalCode: string;
   city: string;
   country: string;
-  orderStatus: number; // Should be string for easier implementations?
+  orderStatus: number;
   items: IAdminOrderDetailItem[];
 
-  // TODO: NEED THIS FROM API!!!
-  totalOrderAmount: number; // (sum of all lineItemTotalPrice)
-  currency: string; // Currency for totalOrderAmount.
+  totalOrderAmount: number;
+  currency: string;
 }
 
 // Represents a single item within the detailed order view for an admin.
@@ -92,7 +91,6 @@ export interface IAdminOrderDetailItem {
   quantity: number;
   unitPrice: number;
 
-  // TODO: NEED THIS FROM API!!!
-  lineItemTotalPrice: number; // (quantity * unitPrice)
-  currency: string; // Currency for unitPrice and lineItemTotalPrice.
+  lineItemTotalPrice: number;
+  currency: string;
 }

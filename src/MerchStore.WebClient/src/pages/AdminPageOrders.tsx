@@ -1,69 +1,103 @@
 import { Box, Button } from '@mui/material';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PageBreadcrumbs from '../components/PageBreadcrumbs';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import OrderAdminTable, { IAdminOrderRow } from '../components/Admin/OrderAdminTable';
+import OrderCreateDialog from '../components/Admin/OrderCreateDialog';
+import { useEffect, useState, useCallback } from 'react';
+import { createOrder, getOrders } from '../api/orderApi';
+import { INewOrder, IOrder } from '../interfaces';
+import toast from 'react-hot-toast';
+import { mapOrderStatusToString } from '../utils/mapOrderStatusToString';
 import CustomSpinner from '../components/CustomSpinner';
 
-// Mock data for now - replace with actual data fetching later
-// Ensure mockOrders matches IAdminOrderRow structure if you haven't defined a global type yet
-const mockOrders: IAdminOrderRow[] = [
-  {
-    id: '5377bf13-a59f-46e7-a0a5-8c61fd881215',
-    customerName: 'Kalle Anka',
-    customerEmail: 'kalle@anka.com',
-    status: 'Received',
-    itemCount: 2,
-    totalPrice: 299,
-    currency: 'SEK',
-  },
-  {
-    id: '5377bf13-a59f-46e7-a0a5-8c61fd881216',
-    customerName: 'Musse Pigg',
-    customerEmail: 'musse@pigg.com',
-    status: 'Processing',
-    itemCount: 1,
-    totalPrice: 199,
-    currency: 'SEK',
-  },
-  {
-    id: '5377bf13-a59f-46e7-a0a5-8c61fd881217',
-    customerName: 'Janne Långben',
-    customerEmail: 'janne@langben.com',
-    status: 'Shipped',
-    itemCount: 5,
-    totalPrice: 799,
-    currency: 'SEK',
-  },
-];
-
 export default function AdminPageOrders() {
-  // TODO: Replace with useOrders hook and actual state management & replace loading state with actual loading state
-  const orders = mockOrders;
-  const isLoading = false;
-
+  const [orders, setOrders] = useState<IAdminOrderRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isCreateOrderDialogOpen, setIsCreateOrderDialogOpen] = useState(false);
   const navigate = useNavigate();
+
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const apiOrders: IOrder[] = await getOrders();
+      const adminTableRows: IAdminOrderRow[] = apiOrders.map((order) => ({
+        id: order.id,
+        customerName: order.fullName,
+        customerEmail: order.email,
+        status: mapOrderStatusToString(order.orderStatus),
+        itemCount: order.orderProducts.reduce((sum, item) => sum + item.quantity, 0),
+        totalPrice: order.orderProducts.reduce(
+          (sum, item) => sum + item.unitPrice * item.quantity,
+          0
+        ),
+        currency: 'SEK',
+      }));
+      setOrders(adminTableRows);
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+      setError('Failed to load orders. Please try again later.');
+      toast.error('Failed to load orders.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const handleViewOrder = (orderId: string) => {
     navigate(`/admin/orders/${orderId}`);
   };
 
+  // Handle delete order action
   const handleDeleteOrder = (orderId: string) => {
     // TODO: Implement delete order functionality with confirmation
-    // This would typically involve opening a confirmation dialog
     console.log('Delete order:', orderId);
-    // Example: setOrderToDelete(orderId); setDeleteDialogOpen(true);
+  };
+
+  // Handles open the create order dialog
+  function handleOpenCreateOrderDialog() {
+    setIsCreateOrderDialogOpen(true);
+  }
+
+  // handles close the create order dialog
+  function handleCloseCreateOrderDialog() {
+    setIsCreateOrderDialogOpen(false);
+  }
+
+  const handleCreateOrderSubmit = async (orderData: INewOrder) => {
+    console.log('Creating order with data:', orderData);
+    try {
+      const newOrder = await createOrder(orderData);
+      toast.success(`Order ${newOrder.id} created successfully!`);
+      console.log('New order created:', newOrder);
+      handleCloseCreateOrderDialog();
+      await fetchOrders();
+    } catch (error) {
+      console.error('Failed to create order:', error);
+      toast.error('Failed to create order. Please try again.');
+    }
   };
 
   return (
     <Box>
       <PageBreadcrumbs />
-      {isLoading ? (
+      {loading ? (
         <CustomSpinner text="Loading orders..." />
+      ) : error ? (
+        <Box sx={{ p: 2, textAlign: 'center' }}>
+          <p>{error}</p>
+          <Button onClick={fetchOrders} sx={{ mt: 2 }}>
+            Try Again
+          </Button>
+        </Box>
       ) : (
         <>
-          {/* Container for Back and Add New Order buttons */}
           <Box sx={BUTTON_ROW_STYLE}>
             <Button
               color={'inherit'}
@@ -77,22 +111,31 @@ export default function AdminPageOrders() {
             <Button
               variant={'contained'}
               color={'primary'}
-              component={RouterLink}
-              to={''}
+              onClick={handleOpenCreateOrderDialog}
               startIcon={<AddCircleOutlineIcon />}
             >
               New Order
             </Button>
           </Box>
 
-          {/* Order Admin Table */}
-          <OrderAdminTable
-            orders={orders}
-            onView={handleViewOrder}
-            onDelete={handleDeleteOrder}
-          />
+          {orders.length === 0 ? (
+            <Box sx={{ textAlign: 'center', mt: 4 }}>
+              <p>No orders found.</p>
+            </Box>
+          ) : (
+            <OrderAdminTable
+              orders={orders}
+              onView={handleViewOrder}
+              onDelete={handleDeleteOrder}
+            />
+          )}
         </>
       )}
+      <OrderCreateDialog
+        open={isCreateOrderDialogOpen}
+        onClose={handleCloseCreateOrderDialog}
+        onSubmit={handleCreateOrderSubmit}
+      />
     </Box>
   );
 }

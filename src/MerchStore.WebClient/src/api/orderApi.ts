@@ -4,7 +4,7 @@ import { IOrder, INewOrder } from '../interfaces';
 const apiUrl: string = import.meta.env.VITE_API_URL;
 const apiKey: string = import.meta.env.VITE_API_KEY;
 
-export async function fetchOrders(): Promise<IOrder[]> {
+export async function getOrders(): Promise<IOrder[]> {
   const token = localStorage.getItem('accessToken');
   const headers: Record<string, string> = {
     'X-API-Key': apiKey,
