@@ -8,9 +8,9 @@ import { fetchProduct } from '../api/productApi';
 import { useCart } from '../hooks/useCart';
 import { ProductDetailsCard } from '../components/Store/ProductDetailsCard';
 import PageBreadcrumbs from '../components/PageBreadcrumbs';
-import { useReviews } from '../hooks/useReviews';
 import CustomSpinner from '../components/CustomSpinner';
 import { ProductReviews } from '../components/ProductDetails/ProductReviews';
+import { useReviews } from '../hooks/useReviews';
 
 export function ProductDetailsPage() {
   const [product, setProduct] = useState<IProduct | null>(null);

@@ -50,6 +50,15 @@ export type ReviewStats = {
   reviewCount: number;
 };
 
+// Lägg till interface för det externa API:ets svar
+export interface ExternalReviewResponse {
+  reviewerName: string;
+  text: string;
+  rating: number;
+  reviewDate: string;
+  reviewId: number;
+}
+
 export interface INewOrderItem {
   productId: string;
   productName: string;
