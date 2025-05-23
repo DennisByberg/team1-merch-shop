@@ -1,19 +1,18 @@
 import { useContext, useEffect } from 'react';
-import { ReviewContext } from '../context/ReviewContext';
+import { ReviewContext } from '../context/ReviewProvider';
 
-export function useReviews(productId: string | undefined) {
-  const ctx = useContext(ReviewContext);
-  if (!ctx) throw new Error('useReviews must be used within ReviewProvider');
-
-  const data = productId ? ctx.getReviewData(productId) : undefined;
+export function useReviews(productId?: string) {
+  const context = useContext(ReviewContext);
+  if (!context) {
+    throw new Error('useReviews must be used within a ReviewProvider');
+  }
 
   useEffect(() => {
-    if (!productId) return;
-    if (!data) {
-      ctx.fetchReviews(productId);
+    if (productId) {
+      console.log('🔄 useReviews hook triggered for product:', productId);
+      context.fetchReviews(productId);
     }
-    // eslint-disable-next-line
-  }, [productId, data]);
+  }, [productId, context.fetchReviews]);
 
-  return data ?? { reviews: [], loading: !!productId };
+  return context;
 }

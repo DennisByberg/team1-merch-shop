@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// TODO: HIDE!
 const apiUrl = import.meta.env.VITE_REVIEW_API_URL;
 const apiKey = import.meta.env.VITE_REVIEW_API_KEY;
 
