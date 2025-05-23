@@ -32,37 +32,37 @@ async function fetchExternalProducts(): Promise<ExternalProduct[]> {
   try {
     console.log('🔄 Fetching external products...');
 
+    // Uppdaterad URL med customer ID
     const response = await axios.get<ExternalProduct[]>(
-      `${API_CONFIG.baseUrl}/product`,
+      `${API_CONFIG.baseUrl}/product/customer/1?sortField=name&direction=asc`,
       createAxiosConfig()
     );
 
-    // Validera att responsen är korrekt
+    // Enligt din cURL returnerar API:et en direkt array
     let products: ExternalProduct[] = response.data;
 
-    // Hantera fall där API:et returnerar ett objekt istället för en array
+    // Säkerhetscheck - API:et ska returnera en direkt array enligt exemplet
     if (!Array.isArray(products)) {
       console.warn('⚠️ API returned non-array data:', typeof products);
+      console.log('🔍 Raw response data:', JSON.stringify(products, null, 2));
 
-      // Cast till unknown först för att kunna komma åt properties
+      // Fallback-hantering om API:et ändrar format
       const responseData = products as unknown;
-
-      // Om det är ett objekt som innehåller en array
       if (responseData && typeof responseData === 'object') {
         const dataObj = responseData as Record<string, unknown>;
 
-        // Kolla vanliga properties som kan innehålla produktarray
-        if ('products' in dataObj && Array.isArray(dataObj.products)) {
+        if ('value' in dataObj && Array.isArray(dataObj.value)) {
+          products = dataObj.value as ExternalProduct[];
+          console.log('✅ Found products array in response.value');
+        } else if ('products' in dataObj && Array.isArray(dataObj.products)) {
           products = dataObj.products as ExternalProduct[];
           console.log('✅ Found products array in response.products');
         } else if ('data' in dataObj && Array.isArray(dataObj.data)) {
           products = dataObj.data as ExternalProduct[];
           console.log('✅ Found products array in response.data');
-        } else if ('items' in dataObj && Array.isArray(dataObj.items)) {
-          products = dataObj.items as ExternalProduct[];
-          console.log('✅ Found products array in response.items');
         } else {
           console.error('❌ No valid products array found in response');
+          console.log('🔍 Available properties:', Object.keys(dataObj));
           return [];
         }
       } else {
@@ -79,6 +79,12 @@ async function fetchExternalProducts(): Promise<ExternalProduct[]> {
 
     setCachedProducts(products);
     console.log(`✅ Fetched ${products.length} external products`);
+
+    // Debug: logga första produkten för att se strukturen
+    if (products.length > 0) {
+      console.log('🔍 First product sample:', products[0]);
+    }
+
     return products;
   } catch (error) {
     console.error('❌ Failed to fetch external products:', error);
@@ -128,8 +134,9 @@ async function findMatchingExternalProduct(
 async function fetchExternalProductReviews(productId: number): Promise<ExternalProduct> {
   console.log(`📡 Fetching reviews for product ID: ${productId}`);
 
+  // Korrekt URL enligt API-dokumentationen
   const response = await axios.get<ExternalProduct>(
-    `${API_CONFIG.baseUrl}/product/1/${productId}`,
+    `${API_CONFIG.baseUrl}/product/customer/1/${productId}`,
     createAxiosConfig()
   );
 
