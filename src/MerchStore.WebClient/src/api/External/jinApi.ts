@@ -37,7 +37,46 @@ async function fetchExternalProducts(): Promise<ExternalProduct[]> {
       createAxiosConfig()
     );
 
-    const products = response.data || [];
+    // Validera att responsen är korrekt
+    let products: ExternalProduct[] = response.data;
+
+    // Hantera fall där API:et returnerar ett objekt istället för en array
+    if (!Array.isArray(products)) {
+      console.warn('⚠️ API returned non-array data:', typeof products);
+
+      // Cast till unknown först för att kunna komma åt properties
+      const responseData = products as unknown;
+
+      // Om det är ett objekt som innehåller en array
+      if (responseData && typeof responseData === 'object') {
+        const dataObj = responseData as Record<string, unknown>;
+
+        // Kolla vanliga properties som kan innehålla produktarray
+        if ('products' in dataObj && Array.isArray(dataObj.products)) {
+          products = dataObj.products as ExternalProduct[];
+          console.log('✅ Found products array in response.products');
+        } else if ('data' in dataObj && Array.isArray(dataObj.data)) {
+          products = dataObj.data as ExternalProduct[];
+          console.log('✅ Found products array in response.data');
+        } else if ('items' in dataObj && Array.isArray(dataObj.items)) {
+          products = dataObj.items as ExternalProduct[];
+          console.log('✅ Found products array in response.items');
+        } else {
+          console.error('❌ No valid products array found in response');
+          return [];
+        }
+      } else {
+        console.error('❌ Invalid response format');
+        return [];
+      }
+    }
+
+    // Validera att products nu är en array
+    if (!Array.isArray(products)) {
+      console.error('❌ Still not an array after processing:', typeof products);
+      return [];
+    }
+
     setCachedProducts(products);
     console.log(`✅ Fetched ${products.length} external products`);
     return products;
@@ -62,6 +101,17 @@ async function findMatchingExternalProduct(
 
     // Hämta externa produkter
     const externalProducts = await fetchExternalProducts();
+
+    // Extra validering och loggning
+    console.log('🔍 External products type:', typeof externalProducts);
+    console.log('🔍 Is array:', Array.isArray(externalProducts));
+    console.log('🔍 Length:', externalProducts?.length);
+
+    if (!Array.isArray(externalProducts)) {
+      console.error('❌ externalProducts is not an array:', externalProducts);
+      return null;
+    }
+
     if (externalProducts.length === 0) {
       console.warn('⚠️ No external products available');
       return null;
@@ -79,7 +129,7 @@ async function fetchExternalProductReviews(productId: number): Promise<ExternalP
   console.log(`📡 Fetching reviews for product ID: ${productId}`);
 
   const response = await axios.get<ExternalProduct>(
-    `${API_CONFIG.baseUrl}/product/${productId}`,
+    `${API_CONFIG.baseUrl}/product/1/${productId}`,
     createAxiosConfig()
   );
 
