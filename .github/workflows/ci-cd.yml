@@ -61,6 +61,8 @@ jobs:
             VITE_REVIEW_API_KEY=${{ secrets.VITE_REVIEW_API_KEY }}
             VITE_CLIENT_ID=${{ secrets.VITE_CLIENT_ID }}
             VITE_CLIENT_SECRET=${{ secrets.VITE_CLIENT_SECRET }}
+            VITE_VITE_REVIEW_API_KEY=${{ secrets.VITE_REVIEW_API_KEY }}
+            VITE_VITE_REVIEW_API_URL=${{ secrets.VITE_REVIEW_API_URL }}
 
   # Runs only if the 'build-and-push-images' job succeeds & it's a push to the main branch
   deploy-to-azure:
