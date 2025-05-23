@@ -19,12 +19,26 @@ export function createMatchingStrategies(internalProduct: IProduct): MatchingStr
   return [
     {
       name: 'Exact name match',
-      matcher: (products: ExternalProduct[]) =>
-        products.find((p) => normalizeString(p.name) === normalizedInternalName) || null,
+      matcher: (products: ExternalProduct[]) => {
+        // Säkerställ att products är en array
+        if (!Array.isArray(products)) {
+          console.warn('⚠️ Products is not an array in exact match:', typeof products);
+          return null;
+        }
+        return (
+          products.find((p) => normalizeString(p.name) === normalizedInternalName) || null
+        );
+      },
     },
     {
       name: 'Partial name match',
       matcher: (products: ExternalProduct[]) => {
+        // Säkerställ att products är en array
+        if (!Array.isArray(products)) {
+          console.warn('⚠️ Products is not an array in partial match:', typeof products);
+          return null;
+        }
+
         const matches = products.filter((p) => {
           const extName = normalizeString(p.name);
           return (
@@ -48,14 +62,37 @@ export function findBestMatch(
   externalProducts: ExternalProduct[],
   internalProduct: IProduct
 ): ExternalProduct | null {
+  // Validera att externalProducts är en array
+  if (!Array.isArray(externalProducts)) {
+    console.error(
+      '❌ externalProducts is not an array:',
+      typeof externalProducts,
+      externalProducts
+    );
+    return null;
+  }
+
+  if (externalProducts.length === 0) {
+    console.warn('⚠️ No external products available for matching');
+    return null;
+  }
+
+  console.log(
+    `🔍 Matching "${internalProduct.name}" against ${externalProducts.length} external products`
+  );
+
   const strategies = createMatchingStrategies(internalProduct);
 
   // Testa varje matchningsstrategi
   for (const strategy of strategies) {
-    const match = strategy.matcher(externalProducts, internalProduct);
-    if (match) {
-      console.log(`✅ ${strategy.name}: ${match.name} (ID: ${match.productId})`);
-      return match;
+    try {
+      const match = strategy.matcher(externalProducts, internalProduct);
+      if (match) {
+        console.log(`✅ ${strategy.name}: ${match.name} (ID: ${match.productId})`);
+        return match;
+      }
+    } catch (error) {
+      console.error(`❌ Error in ${strategy.name}:`, error);
     }
   }
 
