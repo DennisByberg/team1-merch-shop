@@ -1,8 +1,7 @@
 import { AllReviewsResponse, ExternalProduct, ExternalReview } from '../jinApiInterfaces';
 
-// API Configuration with validation
 export const API_CONFIG = {
-  baseUrl: import.meta.env.DEV ? '/api-proxy' : import.meta.env.VITE_JIN_API_URL,
+  baseUrl: '/api-proxy',
   apiKey: import.meta.env.VITE_JIN_API_KEY,
   timeout: 25000,
 } as const;
