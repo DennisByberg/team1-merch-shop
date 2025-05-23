@@ -34,6 +34,12 @@ export default defineConfig(({ mode }) => {
       },
     },
     preview: {
+      host: true, // Tillåt alla hosts
+      allowedHosts: [
+        'localhost',
+        '.azurecontainerapps.io', // Tillåt alla Azure Container Apps domäner
+        'merchstorefrontend.agreeabledesert-a7938720.swedencentral.azurecontainerapps.io',
+      ],
       proxy: {
         '/api-proxy': {
           target: env.VITE_JIN_API_URL || 'http://localhost:3000',
