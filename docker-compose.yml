@@ -1,22 +1,22 @@
-version: '3.8'
+name: merchstore
 
 services:
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/azure-sql-edge:latest
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=Your_password123
     ports:
       - "1433:1433"
     volumes:
-      - sqlserver_data:/var/opt/mssql # Persistent volume för SQL Server-data
+      - sqlserver_data:/var/opt/mssql
 
   backend:
     image: mcr.microsoft.com/dotnet/sdk:9.0
     working_dir: /src/MerchStore.WebApi
     volumes:
       - ./src:/src
-    command: [ "dotnet", "watch", "run", "--urls", "http://0.0.0.0:8080" ]
+    command: [ "dotnet", "run", "--urls", "http://0.0.0.0:8080" ]
     ports:
       - "5293:8080"
     environment:
@@ -27,4 +27,4 @@ services:
       - sqlserver
 
 volumes:
-  sqlserver_data: # Definiera volymen
+  sqlserver_data:
