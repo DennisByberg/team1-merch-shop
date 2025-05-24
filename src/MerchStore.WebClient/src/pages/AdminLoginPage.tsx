@@ -1,70 +1,43 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Box, Paper, TextField, Button, Typography, Alert } from '@mui/material';
-import { useAuth } from '../hooks/useAuth';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import { yellow } from '@mui/material/colors';
-import { redirectToLogin } from '../services/authService';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-
-const SSO_INIT_CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
-const SSO_INIT_CLIENT_SECRET = import.meta.env.VITE_CLIENT_SECRET;
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  darken,
+  Paper,
+  SxProps,
+  TextField,
+  Theme,
+  Typography,
+} from '@mui/material';
+import { grey, yellow } from '@mui/material/colors';
+import { useAdminLogin } from '../hooks/useAdminLogin';
 
 export default function AdminLoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleOidcLogin = () => {
-    setError(null);
-
-    if (!SSO_INIT_CLIENT_ID || !SSO_INIT_CLIENT_SECRET) {
-      setError(
-        'SSO initiation credentials are not configured in the application environment.'
-      );
-      return;
-    }
-
-    if (username === SSO_INIT_CLIENT_ID && password === SSO_INIT_CLIENT_SECRET) {
-      redirectToLogin();
-    } else {
-      setError(
-        'Invalid Client ID or Client Secret to initiate SSO. Please use the configured admin credentials.'
-      );
-    }
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-    try {
-      const success = await login(username, password);
-      if (success) {
-        const from = (location.state as { from?: Location })?.from?.pathname || '/admin';
-        navigate(from, { replace: true });
-      } else {
-        setError('Invalid Client ID or Client Secret.');
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'An unexpected error occurred during login.');
-    }
-  };
+  const {
+    username,
+    setUsername,
+    password,
+    setPassword,
+    error,
+    handleOidcLogin,
+    handleSubmit,
+    navigate,
+    isLoading,
+  } = useAdminLogin();
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 8 }}>
-      <Paper elevation={3} sx={{ padding: 4, width: '100%', maxWidth: 400 }}>
+    <Box sx={CONTAINER_SX}>
+      <Paper elevation={3} sx={PAPER_SX}>
         <Typography variant={'h5'} component={'h1'} gutterBottom textAlign={'center'}>
           Admin Login{' '}
           <AdminPanelSettingsIcon fontSize={'large'} sx={{ color: yellow[400] }} />
         </Typography>
 
         {error && (
-          <Alert severity={'error'} sx={{ mb: 2 }}>
+          <Alert severity={'error'} sx={ALERT_SX}>
             {error}
           </Alert>
         )}
@@ -81,6 +54,7 @@ export default function AdminLoginPage() {
             autoFocus
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            disabled={isLoading}
           />
           <TextField
             margin={'normal'}
@@ -93,24 +67,33 @@ export default function AdminLoginPage() {
             autoComplete={'current-password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
           />
 
           <Button
             fullWidth
             variant={'contained'}
             color={'primary'}
-            endIcon={<VpnKeyIcon />}
-            sx={{ mt: 8, mb: 1 }}
+            endIcon={
+              isLoading ? (
+                <CircularProgress size={16} color={'inherit'} />
+              ) : (
+                <VpnKeyIcon />
+              )
+            }
+            sx={SSO_BUTTON_SX}
             onClick={handleOidcLogin}
+            disabled={isLoading}
           >
-            Sign In with Single Sign On (SSO)
+            {isLoading ? 'Initiating SSO...' : 'Sign In with Single Sign On (SSO)'}
           </Button>
 
           <Button
             fullWidth
             variant={'contained'}
             color={'inherit'}
-            sx={{ mt: 1 }}
+            sx={BACK_BUTTON_SX}
+            disabled={isLoading}
             onClick={() => navigate(-1)}
           >
             Go Back
@@ -120,3 +103,31 @@ export default function AdminLoginPage() {
     </Box>
   );
 }
+
+/*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
+const CONTAINER_SX: SxProps<Theme> = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  mt: 8,
+};
+
+const PAPER_SX: SxProps<Theme> = {
+  padding: 4,
+  width: '100%',
+  maxWidth: 400,
+  bgcolor: darken(grey[900], 0.7),
+};
+
+const ALERT_SX: SxProps<Theme> = {
+  mb: 2,
+};
+
+const SSO_BUTTON_SX: SxProps<Theme> = {
+  mt: 8,
+  mb: 1,
+};
+
+const BACK_BUTTON_SX: SxProps<Theme> = {
+  mt: 1,
+};
