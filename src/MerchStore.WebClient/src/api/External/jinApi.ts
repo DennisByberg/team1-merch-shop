@@ -1,7 +1,12 @@
 import axios from 'axios';
 import { fetchProductReviews as mockFetchProductReviews } from '../reviewApi';
 import { fetchProduct } from '../productApi';
-import { AllReviewsResponse, ExternalProduct } from './jinApiInterfaces';
+import {
+  AllReviewsResponse,
+  ExternalProduct,
+  JinProductRequest,
+  JinProductResponse,
+} from './jinApiInterfaces';
 import { ExternalReviewResponse } from '../../interfaces';
 
 // Import utilities
@@ -226,5 +231,34 @@ async function fetchMockReviews(productGuid: string): Promise<AllReviewsResponse
   }
 }
 
-// Re-export utility functions for debugging
+// Adds a new product to Jin-API external service
+export async function addProductToJinApi(
+  productName: string
+): Promise<JinProductResponse | null> {
+  const jinProductData: JinProductRequest = {
+    name: productName,
+    category: '',
+    tags: [],
+    customerId: 1,
+  };
+
+  try {
+    // Send product creation request to Jin-API
+    const response = await axios.post<JinProductResponse>(
+      `${API_CONFIG.baseUrl}/product/save`,
+      jinProductData,
+      createAxiosConfig()
+    );
+
+    // Clear cache to ensure newly created product is fetched in subsequent requests
+    clearCache();
+
+    return response.data;
+  } catch (error) {
+    console.error('Failed to add product to Jin-API:', error);
+
+    return null;
+  }
+}
+
 export { clearCache, getCacheInfo, getApiConfig };

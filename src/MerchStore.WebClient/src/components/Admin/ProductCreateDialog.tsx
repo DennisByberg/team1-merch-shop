@@ -7,6 +7,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  CircularProgress,
 } from '@mui/material';
 
 interface NewProductForm {
@@ -30,16 +31,17 @@ interface ProductCreateDialogProps {
   isFormValid?: boolean;
   editMode?: boolean;
   isUnchanged?: boolean;
+  isCreating?: boolean;
 }
 
 export default function ProductCreateDialog(props: ProductCreateDialogProps) {
-  const { errors = {}, isFormValid = true, touched = {} } = props;
+  const { errors = {}, isFormValid = true, touched = {}, isCreating = false } = props;
   return (
-    <Dialog open={props.open} onClose={props.onClose}>
-      <DialogTitle>Add New Product</DialogTitle>
+    <Dialog open={props.open} onClose={!isCreating ? props.onClose : undefined}>
+      <DialogTitle>{props.editMode ? 'Edit Product' : 'Add New Product'}</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ mb: 2 }}>
-          Fill in the details for the new product.
+          Fill in the details for the {props.editMode ? 'product' : 'new product'}.
         </DialogContentText>
         <TextField
           name={'name'}
@@ -153,14 +155,25 @@ export default function ProductCreateDialog(props: ProductCreateDialogProps) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onClose}>Cancel</Button>
+        <Button onClick={props.onClose} disabled={isCreating}>
+          Cancel
+        </Button>
         <Button
           onClick={props.onSubmit}
           variant={'contained'}
           color={'success'}
-          disabled={!isFormValid || (props.editMode && props.isUnchanged)}
+          disabled={!isFormValid || (props.editMode && props.isUnchanged) || isCreating}
+          startIcon={
+            isCreating ? <CircularProgress size={20} color="inherit" /> : undefined
+          }
         >
-          {props.editMode ? 'Update' : 'Create'}
+          {isCreating
+            ? props.editMode
+              ? 'Updating...'
+              : 'Creating...'
+            : props.editMode
+            ? 'Update'
+            : 'Create'}
         </Button>
       </DialogActions>
     </Dialog>

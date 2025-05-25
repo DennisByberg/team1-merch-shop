@@ -53,6 +53,7 @@ export default function AdminPageProducts() {
   const navigate = useNavigate();
   const [editProductId, setEditProductId] = useState<string | null>(null);
   const [originalProduct, setOriginalProduct] = useState<INewProductForm | null>(null);
+  const [creating, setCreating] = useState(false);
 
   const isFormValid = useMemo(
     () => Object.keys(validateProductForm(newProduct)).length === 0,
@@ -83,6 +84,7 @@ export default function AdminPageProducts() {
   };
 
   const handleCreateOrUpdateProductSubmit = async () => {
+    setCreating(true);
     try {
       const productToSave = {
         ...newProduct,
@@ -102,6 +104,8 @@ export default function AdminPageProducts() {
       handleCloseCreateDialog();
     } catch {
       toast.error('Failed to save product!');
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -204,6 +208,7 @@ export default function AdminPageProducts() {
             onBlur={handleInputBlur}
             isFormValid={isFormValid}
             editMode={!!editProductId}
+            isCreating={creating}
             isUnchanged={
               editProductId ? isProductUnchanged(originalProduct, newProduct) : false
             }
