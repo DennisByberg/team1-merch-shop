@@ -10,6 +10,8 @@ type Props = {
 };
 
 export function ProductReviews(props: Props) {
+  const shouldShowLoading = props.loading && props.reviews.length === 0;
+
   return (
     <Box mt={3}>
       <Typography variant={'h5'} gutterBottom>
@@ -25,8 +27,8 @@ export function ProductReviews(props: Props) {
         </Typography>
       </Box>
       <Divider />
-      {props.loading ? (
-        <CustomSpinner text="Loading reviews..." />
+      {shouldShowLoading ? (
+        <CustomSpinner text={'Loading reviews...'} />
       ) : props.reviews.length === 0 ? (
         <Typography sx={{ mt: 2 }}>No reviews yet.</Typography>
       ) : (

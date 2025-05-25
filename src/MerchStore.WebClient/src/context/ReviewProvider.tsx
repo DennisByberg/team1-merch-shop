@@ -20,12 +20,8 @@ export function ReviewProvider({ children }: { children: React.ReactNode }) {
   const fetchReviews = useCallback(async (productId: string) => {
     setLoading(true);
     try {
-      console.log('🔍 ReviewProvider fetching reviews for product:', productId);
-
       // Använd den nya funktionen som hanterar hela produkter med alla reviews
       const allReviewsData = await fetchAllProductReviewsByGuid(productId);
-
-      console.log('✅ ReviewProvider received all reviews data:', allReviewsData);
 
       // Konvertera ALLA reviews till vårt format
       const formattedReviews: Review[] = allReviewsData.reviews.map((review, index) => ({
@@ -55,9 +51,6 @@ export function ReviewProvider({ children }: { children: React.ReactNode }) {
       };
 
       setStats(reviewStats);
-      console.log(
-        `✅ ReviewProvider state updated successfully with ${formattedReviews.length} reviews`
-      );
     } catch (error) {
       console.error('❌ ReviewProvider failed to fetch reviews:', error);
       setReviews([]);
