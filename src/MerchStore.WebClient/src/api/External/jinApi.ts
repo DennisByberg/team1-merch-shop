@@ -3,6 +3,8 @@ import { fetchProductReviews as mockFetchProductReviews } from '../reviewApi';
 import { fetchProduct } from '../productApi';
 import {
   AllReviewsResponse,
+  CreateReviewRequest,
+  CreateReviewResponse,
   ExternalProduct,
   JinProductRequest,
   JinProductResponse,
@@ -199,6 +201,36 @@ export async function addProductToJinApi(
     console.error('Failed to add product to Jin-API:', error);
 
     return null;
+  }
+}
+
+// Lägg till denna nya funktion
+export async function createProductReview(
+  productGuid: string,
+  reviewData: CreateReviewRequest
+): Promise<CreateReviewResponse> {
+  try {
+    // Hitta matchande extern produkt
+    const matchingProduct = await findMatchingExternalProduct(productGuid);
+
+    if (!matchingProduct) {
+      throw new Error('No matching external product found');
+    }
+
+    // Skapa review via externa API:et
+    const response = await axios.post<CreateReviewResponse>(
+      `${API_CONFIG.baseUrl}/api/product/${matchingProduct.productId}/review`,
+      reviewData,
+      createAxiosConfig()
+    );
+
+    // Rensa cache så nya reviews hämtas
+    clearCache();
+
+    return response.data;
+  } catch (error) {
+    console.error('❌ Failed to create review:', error);
+    throw new Error('Failed to create review');
   }
 }
 

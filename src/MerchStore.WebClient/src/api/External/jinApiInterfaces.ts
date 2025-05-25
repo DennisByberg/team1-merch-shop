@@ -47,3 +47,18 @@ export interface JinProductResponse {
   createdDate: string;
   reviews: ExternalReview[];
 }
+
+// Jin-API review creation and response interfaces
+export interface CreateReviewRequest {
+  reviewerName: string;
+  text: string;
+  rating: number;
+}
+
+export interface CreateReviewResponse {
+  reviewerName: string;
+  text: string;
+  rating: number;
+  reviewDate: string;
+  reviewId: number;
+}
