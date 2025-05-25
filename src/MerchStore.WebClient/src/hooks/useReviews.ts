@@ -7,12 +7,13 @@ export function useReviews(productId?: string) {
     throw new Error('useReviews must be used within a ReviewProvider');
   }
 
+  const { fetchReviews } = context;
+
   useEffect(() => {
     if (productId) {
-      console.log('🔄 useReviews hook triggered for product:', productId);
-      context.fetchReviews(productId);
+      fetchReviews(productId);
     }
-  }, [productId, context.fetchReviews]);
+  }, [productId, fetchReviews]);
 
   return context;
 }

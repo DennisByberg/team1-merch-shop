@@ -141,7 +141,6 @@ export default function OrderCreateDialog(props: OrderCreateDialogProps) {
   };
 
   const handleSubmit = async () => {
-    console.log('Submitting order data:', formData);
     if (!validateForm()) {
       return;
     }

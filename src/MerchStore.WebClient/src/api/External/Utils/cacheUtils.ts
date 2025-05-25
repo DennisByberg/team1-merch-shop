@@ -9,7 +9,6 @@ export function getCachedProducts(): ExternalProduct[] | null {
 
 export function setCachedProducts(products: ExternalProduct[]): void {
   externalProductsCache = products;
-  console.log(`🔄 Cache updated with ${products.length} products`);
 }
 
 export function updateProductInCache(productData: ExternalProduct): void {
@@ -21,13 +20,11 @@ export function updateProductInCache(productData: ExternalProduct): void {
 
   if (cacheIndex >= 0) {
     externalProductsCache[cacheIndex] = productData;
-    console.log('🔄 Cache updated with fresh data');
   }
 }
 
 export function clearCache(): void {
   externalProductsCache = null;
-  console.log('🗑️ External products cache cleared');
 }
 
 export function getCacheInfo() {
