@@ -5,12 +5,6 @@ export default defineConfig(({ mode }) => {
   // Ladda miljövariabler
   const env = loadEnv(mode, process.cwd(), '');
 
-  // Debug loggning
-  console.log('🔧 Vite config loading...');
-  console.log('  Mode:', mode);
-  console.log('  VITE_JIN_API_URL:', env.VITE_JIN_API_URL ? '***set***' : 'MISSING');
-  console.log('  VITE_JIN_API_KEY:', env.VITE_JIN_API_KEY ? '***set***' : 'MISSING');
-
   return {
     plugins: [react()],
     server: {
@@ -24,9 +18,8 @@ export default defineConfig(({ mode }) => {
               const apiKey = env.VITE_JIN_API_KEY;
               if (apiKey) {
                 proxyReq.setHeader('X-API-KEY', apiKey);
-                console.log('🔑 Adding API key to proxy request');
               } else {
-                console.error('❌ No API key found for proxy request');
+                console.error('No API key found for proxy request');
               }
             });
           },
@@ -34,10 +27,10 @@ export default defineConfig(({ mode }) => {
       },
     },
     preview: {
-      host: true, // Tillåt alla hosts
+      host: true, // allow all hosts to access the preview server
       allowedHosts: [
         'localhost',
-        '.azurecontainerapps.io', // Tillåt alla Azure Container Apps domäner
+        '.azurecontainerapps.io', // allow all Azure Container Apps subdomains
         'merchstorefrontend.agreeabledesert-a7938720.swedencentral.azurecontainerapps.io',
       ],
       proxy: {
@@ -50,9 +43,8 @@ export default defineConfig(({ mode }) => {
               const apiKey = env.VITE_JIN_API_KEY;
               if (apiKey) {
                 proxyReq.setHeader('X-API-KEY', apiKey);
-                console.log('🔑 Adding API key to proxy request');
               } else {
-                console.error('❌ No API key found for proxy request');
+                console.error('No API key found for proxy request');
               }
             });
           },

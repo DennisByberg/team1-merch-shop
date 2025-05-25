@@ -85,9 +85,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const loginAdmin = useCallback(
     async (usernameInput: string, passwordInput: string): Promise<boolean> => {
       if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
-        console.error(
-          'Admin credentials (VITE_CLIENT_ID or VITE_CLIENT_SECRET) are not configured.'
-        );
         return false;
       }
       if (usernameInput === ADMIN_USERNAME && passwordInput === ADMIN_PASSWORD) {
@@ -135,9 +132,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } else {
           localStorage.removeItem('isAdminLoggedIn');
         }
-        console.log(
-          `OIDC tokens stored. User: ${usersName}, Admin status: ${!!userIsAdmin}`
-        );
       } else {
         setIsAdmin(false);
         setUserName(null);

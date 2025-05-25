@@ -82,17 +82,3 @@ export function getApiConfig() {
     isValid: !!API_CONFIG.baseUrl && !!API_CONFIG.apiKey,
   };
 }
-
-// Debug function to check configuration
-export function debugApiConfig() {
-  console.log('🔍 API Configuration Debug:', {
-    isDev: import.meta.env.DEV,
-    baseUrl: API_CONFIG.baseUrl ? '✅ Set' : '❌ Missing',
-    apiKey: API_CONFIG.apiKey ? '✅ Set' : '❌ Missing',
-    timeout: API_CONFIG.timeout,
-    envVars: {
-      VITE_JIN_API_URL: import.meta.env.VITE_JIN_API_URL ? '✅ Set' : '❌ Missing',
-      VITE_JIN_API_KEY: import.meta.env.VITE_JIN_API_KEY ? '✅ Set' : '❌ Missing',
-    },
-  });
-}

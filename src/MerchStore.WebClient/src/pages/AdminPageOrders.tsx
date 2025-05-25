@@ -55,9 +55,8 @@ export default function AdminPageOrders() {
   };
 
   // Handle delete order action
-  const handleDeleteOrder = (orderId: string) => {
+  const handleDeleteOrder = () => {
     // TODO: Implement delete order functionality with confirmation
-    console.log('Delete order:', orderId);
   };
 
   // Handles open the create order dialog
@@ -71,15 +70,12 @@ export default function AdminPageOrders() {
   }
 
   const handleCreateOrderSubmit = async (orderData: INewOrder) => {
-    console.log('Creating order with data:', orderData);
     try {
       const newOrder = await createOrder(orderData);
       toast.success(`Order ${newOrder.id} created successfully!`);
-      console.log('New order created:', newOrder);
       handleCloseCreateOrderDialog();
       await fetchOrders();
-    } catch (error) {
-      console.error('Failed to create order:', error);
+    } catch {
       toast.error('Failed to create order. Please try again.');
     }
   };

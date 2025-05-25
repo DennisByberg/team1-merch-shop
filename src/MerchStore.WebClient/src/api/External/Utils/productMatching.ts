@@ -22,7 +22,6 @@ export function createMatchingStrategies(internalProduct: IProduct): MatchingStr
       matcher: (products: ExternalProduct[]) => {
         // Säkerställ att products är en array
         if (!Array.isArray(products)) {
-          console.warn('⚠️ Products is not an array in exact match:', typeof products);
           return null;
         }
         return (
@@ -35,7 +34,6 @@ export function createMatchingStrategies(internalProduct: IProduct): MatchingStr
       matcher: (products: ExternalProduct[]) => {
         // Säkerställ att products är en array
         if (!Array.isArray(products)) {
-          console.warn('⚠️ Products is not an array in partial match:', typeof products);
           return null;
         }
 
@@ -62,24 +60,11 @@ export function findBestMatch(
   externalProducts: ExternalProduct[],
   internalProduct: IProduct
 ): ExternalProduct | null {
-  // Validera att externalProducts är en array
-  if (!Array.isArray(externalProducts)) {
-    console.error(
-      '❌ externalProducts is not an array:',
-      typeof externalProducts,
-      externalProducts
-    );
-    return null;
-  }
+  // Validate that externalProducts is an array
+  if (!Array.isArray(externalProducts)) return null;
 
-  if (externalProducts.length === 0) {
-    console.warn('⚠️ No external products available for matching');
-    return null;
-  }
-
-  console.log(
-    `🔍 Matching "${internalProduct.name}" against ${externalProducts.length} external products`
-  );
+  // Validate that externalProducts is not empty
+  if (externalProducts.length === 0) return null;
 
   const strategies = createMatchingStrategies(internalProduct);
 
@@ -88,7 +73,6 @@ export function findBestMatch(
     try {
       const match = strategy.matcher(externalProducts, internalProduct);
       if (match) {
-        console.log(`✅ ${strategy.name}: ${match.name} (ID: ${match.productId})`);
         return match;
       }
     } catch (error) {
@@ -96,6 +80,5 @@ export function findBestMatch(
     }
   }
 
-  console.log(`⚠️ No match found for "${internalProduct.name}", will use mock data`);
   return null;
 }
