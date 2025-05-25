@@ -31,6 +31,12 @@ export function ProductDetailsPage() {
       .catch(() => setProduct(null));
   }, [id]);
 
+  const handleReviewsUpdated = () => {
+    if (product?.id) {
+      reviewsData?.fetchReviews(product.id);
+    }
+  };
+
   return (
     <Box>
       {!product ? (
@@ -38,25 +44,39 @@ export function ProductDetailsPage() {
       ) : (
         <>
           <PageBreadcrumbs productName={product.name} />
+          <Box sx={BUTTON_ROW_STYLE}>
+            <Button
+              color={'inherit'}
+              variant={'outlined'}
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate('/store')}
+            >
+              Back to Store
+            </Button>
+          </Box>
           <ProductDetailsCard
             product={product}
             quantityInCart={quantityInCart}
             addToCart={addToCart}
           />
-
-          <Button
-            sx={{ mt: 3 }}
-            color={'inherit'}
-            variant={'outlined'}
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
-          >
-            Continue shopping
-          </Button>
-
-          <ProductReviews reviews={reviews} stats={stats} loading={loading} />
+          <ProductReviews
+            reviews={reviews}
+            stats={stats}
+            loading={loading}
+            productId={product.id}
+            onReviewsUpdated={handleReviewsUpdated}
+          />
         </>
       )}
     </Box>
   );
 }
+
+/*━━━━━━━━━━━━ Styling ━━━━━━━━━━━━*/
+const BUTTON_ROW_STYLE = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  mb: 3,
+  mt: 3,
+};
