@@ -12,15 +12,16 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Lägg endast till Azure Key Vault-konfiguration om applikationen körs i produktionsmiljö.
-if (builder.Environment.IsProduction())
-{
-    var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
-    builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
-}
+// Key Vault
+var keyVaultUri = new Uri("https://merchstorekeyvault.vault.azure.net/");
+builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
+// Configure database
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") + ";Connection Timeout=60;"));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.MigrationsAssembly("MerchStore.Infrastructure")
+    ));
 
 // Add support for controllers (API endpoints)
 builder.Services.AddControllers();
@@ -31,8 +32,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie();
 
 // Add API key authentication
+var apiKeyValue = builder.Configuration["ApiKey:Value"];
+if (string.IsNullOrEmpty(apiKeyValue))
+{
+    throw new InvalidOperationException("API Key is not configured in appsettings.json or Key Vault.");
+}
+
 builder.Services.AddAuthentication()
-   .AddApiKey(builder.Configuration["ApiKey:Value"] ?? throw new InvalidOperationException("API Key is not configured in the application settings."));
+   .AddApiKey(apiKeyValue);
 
 // Add API key authorization policy
 builder.Services.AddAuthorization(options =>
@@ -42,32 +49,27 @@ builder.Services.AddAuthorization(options =>
               .RequireAuthenticatedUser());
 });
 
-// configure https localhost
+// Configure Kestrel server - Only HTTP for development to avoid CORS issues
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     if (builder.Environment.IsDevelopment())
     {
-        // Check if we're running in Docker (simple environment variable check)
+        // Check if we're running in Docker
         bool isRunningInDocker = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"));
 
         if (isRunningInDocker)
         {
-            // In Docker, just use HTTP
-            serverOptions.ListenAnyIP(8080); // Match port in docker-compose.yml
+            serverOptions.ListenAnyIP(8080);
         }
         else
         {
-            // Local development outside Docker
-            serverOptions.ListenAnyIP(5000); // HTTP
-            serverOptions.ListenAnyIP(5001, listenOptions =>
-            {
-                listenOptions.UseHttps(); // Uses the dev cert by default for localhost
-            });
+            // Only HTTP for development to simplify CORS
+            serverOptions.ListenAnyIP(5000);
         }
     }
     else
     {
-        // Production code remains unchanged
+        // Production
         var portEnvVar = Environment.GetEnvironmentVariable("PORT");
         if (!string.IsNullOrEmpty(portEnvVar) && int.TryParse(portEnvVar, out int port))
         {
@@ -80,26 +82,22 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     }
 });
 
-// Configure CORS policy to allow any origin, header, and method
+// Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins", builder =>
+    options.AddDefaultPolicy(policy =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyHeader()
-               .AllowAnyMethod();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
-// Register application services (e.g. services, repositories)
+// Register application and infrastructure services
 builder.Services.AddApplication();
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// Register infrastructure services (e.g. DbContext, repositories)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Add Swagger/OpenAPI for API documentation
+// Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -146,12 +144,15 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
     }
 });
+
+// Configure OpenIddict
 builder.Services.AddOpenIddict()
     .AddValidation(options =>
     {
-        options.UseLocalServer();      // <-- This links the validation to your local server
-        options.UseAspNetCore();       // <-- Enables JWT validation in ASP.NET Core middleware
-    }).AddServer(options =>
+        options.UseLocalServer();
+        options.UseAspNetCore();
+    })
+    .AddServer(options =>
     {
         options.SetTokenEndpointUris("/connect/token")
             .SetAuthorizationEndpointUris("/connect/authorize");
@@ -171,50 +172,37 @@ builder.Services.AddOpenIddict()
         }
     });
 
-
-
-// Build the application pipeline
+// Build the application
 var app = builder.Build();
 
 // Configure Forwarded Headers Middleware
-// This should be one of the first middleware components configured.
 var forwardedHeadersOptions = new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 };
-// These are important for environments like Azure Container Apps
 forwardedHeadersOptions.KnownNetworks.Clear();
 forwardedHeadersOptions.KnownProxies.Clear();
 
 app.UseForwardedHeaders(forwardedHeadersOptions);
+app.UseCors();
 
-// Configure the HTTP request pipeline for the application
-if (app.Environment.IsDevelopment())
-{
-    // Seed the database with initial data in development mode
-    // app.Services.SeedDatabaseAsync().Wait();
-}
-
+// Configure middleware pipeline
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "MerchStore API V1");
 });
 
-// Only use HTTPS Redirection if not running in Docker development mode where only HTTP is served
-// or if in production and you want to enforce HTTPS (assuming your production setup handles HTTPS termination)
-bool isRunningInDockerDevelopment = app.Environment.IsDevelopment() &&
-                                   !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"));
-
-if (!isRunningInDockerDevelopment) // Or more specific conditions based on your HTTPS setup
+// No HTTPS redirection in development to simplify CORS
+if (!builder.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
 
-app.UseCors("AllowAllOrigins"); // Enable CORS policy
-app.UseAuthentication();        // Enable authentication middleware
-app.UseAuthorization();         // Enable authentication and authorization middleware
-app.MapControllers();           // Map API controllers
+// Authentication and Authorization come AFTER CORS
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 // Redirect root URL to Swagger UI
 app.MapGet("/", context =>
@@ -223,6 +211,7 @@ app.MapGet("/", context =>
     return Task.CompletedTask;
 });
 
+// Database initialization
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -231,30 +220,38 @@ using (var scope = app.Services.CreateScope())
     {
         if (app.Environment.IsDevelopment())
         {
-            Console.WriteLine("Development environment detected: Recreating database...");
-            db.Database.EnsureDeleted();
-            db.Database.EnsureCreated();
+            Console.WriteLine("Development environment detected: Applying migrations...");
+            await db.Database.MigrateAsync();
 
-            // Seed the database after recreation
-            await app.Services.SeedDatabaseAsync();
+            // Seed only if database is empty
+            if (!await db.Products.AnyAsync())
+            {
+                Console.WriteLine("Database is empty, seeding data...");
+                await app.Services.SeedDatabaseAsync();
+            }
+            else
+            {
+                Console.WriteLine("Database already contains data, skipping seed.");
+            }
 
-            Console.WriteLine("Database recreated successfully.");
+            Console.WriteLine("Database setup completed successfully.");
         }
         else
         {
             Console.WriteLine("Production environment detected: Applying migrations...");
-            db.Database.Migrate();
+            await db.Database.MigrateAsync();
             Console.WriteLine("Migrations applied successfully.");
         }
     }
     catch (Exception ex)
     {
         Console.WriteLine($"Error setting up database: {ex.Message}");
-        // Eventuellt logga felet mer detaljerat eller vidta åtgärder
+        throw;
     }
 }
 
 // Configure OpenIddict providers
-new LoginService(app.Services).StartAsync(default).Wait(); // Start the login service
+new LoginService(app.Services).StartAsync(default).Wait();
+
 // Run the application
 app.Run();
