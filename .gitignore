@@ -61,6 +61,16 @@ ehthumbs.db
 *.tfstate.*
 .terraform/
 *.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+terraform.tfvars
+terraform.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
 
 # Publish/Deploy
 *.publish.xml
