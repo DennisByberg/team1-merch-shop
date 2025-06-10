@@ -1,16 +1,22 @@
+variable "subscription_id" {
+  description = "Azure subscription ID"
+  type        = string
+  sensitive   = true
+}
+
 variable "resource_group_name" {
-  description = "Name of the Azure resource group"
+  description = "Name of the resource group"
   type        = string
   default     = "MerchStoreRG"
 }
 
 variable "location" {
-  description = "Azure region where resources will be created"
+  description = "Azure region for resources"
   type        = string
-  default     = "swedencentral"
+  default     = "Sweden Central"
 }
 
-variable "environment_name" {
+variable "container_app_environment_name" {
   description = "Name of the Container App Environment"
   type        = string
   default     = "MerchStoreEnv"
@@ -22,44 +28,44 @@ variable "backend_app_name" {
   default     = "merchstorebackend"
 }
 
+variable "backend_image" {
+  description = "Docker image for backend container"
+  type        = string
+  sensitive   = true
+}
+
 variable "frontend_app_name" {
   description = "Name of the frontend Container App"
   type        = string
   default     = "merchstorefrontend"
 }
 
-variable "backend_container_image" {
-  description = "Docker image for the backend container app"
+variable "frontend_image" {
+  description = "Docker image for frontend container"
   type        = string
-  default     = "dennisbyberg/merch-store-backend:latest"
+  sensitive   = true
 }
 
-variable "frontend_container_image" {
-  description = "Docker image for the frontend container app"
+variable "api_env_name" {
+  description = "Environment variable name for API URL"
   type        = string
-  default     = "dennisbyberg/merch-store-frontend:latest"
+  default     = "VITE_API_URL"
 }
 
-variable "container_port" {
-  description = "Container port to expose"
-  type        = number
-  default     = 8080
-}
-
-variable "frontend_port" {
-  description = "Frontend container port to expose"
-  type        = number
-  default     = 80
-}
-
-variable "cpu" {
-  description = "CPU allocation for the container"
-  type        = number
-  default     = 0.25
-}
-
-variable "memory" {
-  description = "Memory allocation for the container"
+variable "api_url" {
+  description = "Backend API URL for frontend"
   type        = string
-  default     = "0.5Gi"
+  sensitive   = true
+}
+
+variable "key_vault_name" {
+  description = "Name of the key vault"
+  type        = string
+  default     = "merchstorekeyvault"
+}
+
+variable "azurerm_storage_account_name" {
+  description = "Name of the storage account"
+  type        = string
+  default     = "merchstorageno1"
 }
