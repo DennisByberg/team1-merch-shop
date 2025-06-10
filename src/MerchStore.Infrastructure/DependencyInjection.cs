@@ -6,6 +6,8 @@ using MerchStore.Infrastructure.Persistence;
 using MerchStore.Infrastructure.Persistence.Repositories;
 using MerchStore.Infrastructure.ExternalServices.Reviews.Configurations;
 using MerchStore.Infrastructure.ExternalServices.Reviews;
+using MerchStore.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace MerchStore.Infrastructure;
@@ -14,6 +16,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // Add database context
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(
+                configuration.GetConnectionString("DefaultConnection"),
+                sqlOptions => sqlOptions.MigrationsAssembly("MerchStore.Infrastructure")
+            ));
+
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IRepositoryManager, RepositoryManager>();
         services.AddScoped<IOrderRepository, OrderRepository>();
@@ -26,6 +35,9 @@ public static class DependencyInjection
 
         // Register the external review services
         services.AddReviewServices(configuration);
+
+        // Add database initialization as a hosted service
+        services.AddHostedService<DatabaseInitializationService>();
 
         return services;
     }
@@ -55,35 +67,37 @@ public static class DependencyInjection
         services.AddOpenIddict()
             .AddCore(options =>
             {
-                // Register the Entity Framework Core stores.
                 options.UseEntityFrameworkCore()
                     .UseDbContext<AppDbContext>();
             })
+            .AddValidation(options =>
+            {
+                options.UseLocalServer();
+                options.UseAspNetCore();
+            })
             .AddServer(options =>
             {
-                // Enable the token endpoint.
-                options.SetTokenEndpointUris("/connect/token");
+                options.SetTokenEndpointUris("/connect/token")
+                    .SetAuthorizationEndpointUris("/connect/authorize");
 
-                // Enable the client credentials flow.
-                options.AllowClientCredentialsFlow();
+                options.AllowAuthorizationCodeFlow();
 
-                // Register the signing and encryption credentials.
                 options.AddDevelopmentEncryptionCertificate()
                     .AddDevelopmentSigningCertificate();
 
-                // Register the ASP.NET Core host and configure the endpoints.
                 options.UseAspNetCore()
-                    .EnableTokenEndpointPassthrough();
-            })
-            .AddValidation(options =>
-            {
-                // Register the ASP.NET Core host.
-                options.UseAspNetCore();
+                    .EnableTokenEndpointPassthrough()
+                    .EnableAuthorizationEndpointPassthrough();
 
+                // Check environment from configuration or environment variable
+                var isDevelopment = configuration.GetValue<bool>("IsDevelopment") ||
+                                   Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
+                if (isDevelopment)
+                {
+                    options.UseAspNetCore().DisableTransportSecurityRequirement();
+                }
             });
-
-
 
         return services;
     }
