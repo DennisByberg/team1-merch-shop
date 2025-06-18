@@ -6,7 +6,10 @@ using MerchStore.WebApi.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 // Azure configuration
-builder.Configuration.AddAzureKeyVault();
+if (!builder.Environment.IsDevelopment())
+{
+    AzureConfiguration.AddAzureKeyVault(builder.Configuration);
+}
 
 // Kestrel configuration
 builder.WebHost.ConfigureKestrel(builder.Environment);

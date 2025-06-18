@@ -65,39 +65,40 @@ public static class DependencyInjection
     public static IServiceCollection AddOpenIddictServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOpenIddict()
-            .AddCore(options =>
+        .AddCore(options =>
+        {
+            options.UseEntityFrameworkCore()
+                .UseDbContext<AppDbContext>();
+        })
+        .AddValidation(options =>
+        {
+            options.UseLocalServer();
+            options.UseAspNetCore();
+        })
+        .AddServer(options =>
+        {
+            options.SetTokenEndpointUris("/connect/token")
+                .SetAuthorizationEndpointUris("/connect/authorize");
+
+            options.AllowAuthorizationCodeFlow();
+
+            // Use ephemeral keys for development instead of certificates
+            options.AddEphemeralEncryptionKey()
+                .AddEphemeralSigningKey();
+
+            options.UseAspNetCore()
+                .EnableTokenEndpointPassthrough()
+                .EnableAuthorizationEndpointPassthrough()
+                .DisableTransportSecurityRequirement(); // Allow HTTP in development
+
+            var isDevelopment = configuration.GetValue<bool>("IsDevelopment") ||
+                              Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+            if (isDevelopment)
             {
-                options.UseEntityFrameworkCore()
-                    .UseDbContext<AppDbContext>();
-            })
-            .AddValidation(options =>
-            {
-                options.UseLocalServer();
-                options.UseAspNetCore();
-            })
-            .AddServer(options =>
-            {
-                options.SetTokenEndpointUris("/connect/token")
-                    .SetAuthorizationEndpointUris("/connect/authorize");
-
-                options.AllowAuthorizationCodeFlow();
-
-                options.AddDevelopmentEncryptionCertificate()
-                    .AddDevelopmentSigningCertificate();
-
-                options.UseAspNetCore()
-                    .EnableTokenEndpointPassthrough()
-                    .EnableAuthorizationEndpointPassthrough();
-
-                // Check environment from configuration or environment variable
-                var isDevelopment = configuration.GetValue<bool>("IsDevelopment") ||
-                                   Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-
-                if (isDevelopment)
-                {
-                    options.UseAspNetCore().DisableTransportSecurityRequirement();
-                }
-            });
+                options.DisableAccessTokenEncryption(); // Disable encryption for development
+            }
+        });
 
         return services;
     }

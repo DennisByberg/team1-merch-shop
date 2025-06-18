@@ -5,14 +5,14 @@ import {
   Rating,
   SxProps,
   Theme,
-  Button,
+  // Button,
   Collapse,
 } from '@mui/material';
 import { useState } from 'react';
 import CustomSpinner from '../CustomSpinner';
 import { Review, ReviewStats } from '../../interfaces';
 import { grey } from '@mui/material/colors';
-import EditIcon from '@mui/icons-material/Edit';
+// import EditIcon from '@mui/icons-material/Edit';
 import { ReviewForm } from './ReviewForm';
 
 type Props = {
@@ -46,13 +46,13 @@ export function ProductReviews(props: Props) {
         <Box display={'flex'}>
           <Rating value={props.stats?.averageRating || 0} precision={0.1} readOnly />
           <Typography variant={'body1'} sx={{ ml: 1 }}>
-            {props.stats?.averageRating !== undefined
+            {props.stats?.averageRating !== undefined && !isNaN(props.stats.averageRating)
               ? props.stats.averageRating.toFixed(1)
               : 'No rating'}{' '}
             / 5
           </Typography>
         </Box>
-        <Button
+        {/* <Button
           sx={{ mb: 2 }}
           variant={'outlined'}
           startIcon={<EditIcon />}
@@ -60,7 +60,7 @@ export function ProductReviews(props: Props) {
           color={'success'}
         >
           {showReviewForm ? 'Cancel' : 'Write Review'}
-        </Button>
+        </Button> */}
       </Box>
 
       <Collapse in={showReviewForm}>
@@ -80,7 +80,7 @@ export function ProductReviews(props: Props) {
       ) : props.reviews.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography variant={'body1'} color={'text.secondary'}>
-            No reviews yet. Be the first to review this product!
+            No reviews yet.
           </Typography>
         </Box>
       ) : (
@@ -108,6 +108,7 @@ const HEADER_CONTAINER_SX: SxProps<Theme> = {
 };
 
 const RATING_ROW_SX: SxProps<Theme> = {
+  mb: 2,
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
