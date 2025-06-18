@@ -3,7 +3,7 @@ import { AllReviewsResponse, ExternalProduct, ExternalReview } from '../jinApiIn
 export const API_CONFIG = {
   baseUrl: '/api-proxy',
   apiKey: import.meta.env.VITE_JIN_API_KEY,
-  timeout: 60000, // 60 seconds
+  timeout: 1, // 60 seconds
 } as const;
 
 // Validate API configuration

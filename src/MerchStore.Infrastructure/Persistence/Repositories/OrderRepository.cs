@@ -1,8 +1,6 @@
 using MerchStore.Domain.Entities;
 using MerchStore.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using MerchStore.Domain.Entities;
-
 
 namespace MerchStore.Infrastructure.Persistence.Repositories;
 
@@ -59,7 +57,7 @@ public class OrderRepository : IOrderRepository
         // Update the existing order with the new values
         existingOrder.CustomerName = updatedOrder.CustomerName;
         existingOrder.OrderDate = updatedOrder.OrderDate;
-        
+
 
         // Update the order products
         foreach (var orderProduct in updatedOrder.OrderProducts)
