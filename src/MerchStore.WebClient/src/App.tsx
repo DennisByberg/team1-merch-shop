@@ -19,6 +19,7 @@ import AdminLoginPage from './pages/AdminLoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminPageOrders from './pages/AdminPageOrders';
 import AdminPageOrderDetail from './pages/AdminPageOrderDetail';
+import AboutPage from './pages/AboutPage';
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
                     {/* Publika Routes */}
                     <Route path={'/'} element={<HomePage />} />
                     <Route path={'/store'} element={<StorePage />} />
+                    <Route path={'/about'} element={<AboutPage />} />
                     <Route path={'/store/:id'} element={<ProductDetailsPage />} />
                     <Route path={'/cart'} element={<CartPage />} />
                     <Route path={'/checkout'} element={<CheckoutPage />} />

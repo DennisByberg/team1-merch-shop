@@ -24,6 +24,11 @@ export function getCrumbs(pathname: string, productName?: string): Crumb[] {
       }
       break;
 
+    // About
+    case 'about':
+      crumbs.push({ label: 'About' });
+      break;
+
     // CART
     case 'cart':
       crumbs.push({ label: 'Cart' });
