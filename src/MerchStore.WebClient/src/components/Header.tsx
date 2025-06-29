@@ -61,6 +61,11 @@ export default function Header() {
             <ListItemText primary={'Store'} />
           </ListItemButton>
         </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to={'/about'} sx={{ textAlign: 'center' }}>
+            <ListItemText primary={'About'} />
+          </ListItemButton>
+        </ListItem>
         <Divider />
         {isLoading ? (
           <ListItem>
@@ -134,6 +139,9 @@ export default function Header() {
               </Box>
               <Box component={Link} to={'/store'} sx={HEADER_LINK_STYLE}>
                 Store
+              </Box>
+              <Box component={Link} to={'/about'} sx={HEADER_LINK_STYLE}>
+                About
               </Box>
               {isAdmin && (
                 <Box component={Link} to={'/admin'} sx={HEADER_LINK_STYLE}>

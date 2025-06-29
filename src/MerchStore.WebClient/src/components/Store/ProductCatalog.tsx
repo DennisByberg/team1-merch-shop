@@ -11,7 +11,14 @@ export function ProductCatalog() {
   return (
     <Box>
       {loading ? (
-        <CustomSpinner text="Fetching products from the back of the store..." />
+        <CustomSpinner
+          texts={[
+            'Fetching products from the back of the store...',
+            'Loading taking time? Read our About page to see why...',
+            'Just a moment longer, quality products take time...',
+          ]}
+          intervalSeconds={2}
+        />
       ) : (
         <Box sx={CATALOG_CONTAINER_SX}>
           {products.map((product) => (
